@@ -36,6 +36,36 @@ describe("OpenUI Lang Component Library & Parser", () => {
     expect(result.root?.typeName).toBe("Stack");
   });
 
+  it("supports Steps, Step, and CodeBlock with flexible argument signatures", () => {
+    const program = [
+      'root = Stack([title, steps, equation])',
+      'title = TextContent("Photosynthesis Steps", "large-heavy")',
+      'steps = Steps("Process Guide", [step1, step2])',
+      'step1 = Step("1 · Light enters", "Sunlight is absorbed.")',
+      'step2 = Step("2 · Sugar is built", "Glucose is produced.")',
+      'equation = CodeBlock("6 CO2 + 6 H2O -> C6H12O6 + 6 O2")',
+    ].join("\n");
+
+    const parser = createParser(renderLibrary.toJSONSchema(), renderLibrary.root);
+    const result = parser.parse(program);
+    expect(result.meta.errors).toEqual([]);
+    expect(result.root?.typeName).toBe("Stack");
+  });
+
+  it("supports Stepper alias and 2-arg CodeBlock", () => {
+    const program = [
+      'root = Stack([stepper, code])',
+      'stepper = Stepper([s1])',
+      's1 = StepsItem("Step 1", "Details")',
+      'code = CodeBlock("python", "print(\'photosynthesis\')")',
+    ].join("\n");
+
+    const parser = createParser(renderLibrary.toJSONSchema(), renderLibrary.root);
+    const result = parser.parse(program);
+    expect(result.meta.errors).toEqual([]);
+    expect(result.root?.typeName).toBe("Stack");
+  });
+
   it("supports conversational Card containers", () => {
     const program = [
       'root = Card([header, callout])',

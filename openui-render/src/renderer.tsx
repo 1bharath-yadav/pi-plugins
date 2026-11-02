@@ -39,7 +39,7 @@ class OpenUIErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySta
       return (
         <div className="pi-openui-errors">
           <div className="pi-openui-error-item">
-            <strong>Render exception:</strong> {this.state.error?.message || String(this.state.error)}
+            <strong>Render notice:</strong> {this.state.error?.message || String(this.state.error)}
           </div>
         </div>
       );
@@ -78,6 +78,8 @@ export function OpenUIBlockComponent({ language, source }: OpenUIBlockProps) {
   const handleError = useCallback((errs: any[]) => {
     if (errs && errs.length) {
       setErrors(errs.map((e) => (typeof e?.message === "string" ? e.message : String(e))));
+    } else {
+      setErrors([]);
     }
   }, []);
 
@@ -103,6 +105,24 @@ export function OpenUIBlockComponent({ language, source }: OpenUIBlockProps) {
         <div className="pi-openui-tag">
           <OpenUIIcon size={18} />
           <span className="pi-openui-title">OpenUi</span>
+          {errors.length > 0 && (
+            <span
+              className="pi-openui-warning-badge"
+              onClick={() => setShowSource(true)}
+              title="Click to view syntax warnings in Source tab"
+              style={{
+                fontSize: "11px",
+                padding: "1px 6px",
+                borderRadius: "10px",
+                background: "rgba(234, 179, 8, 0.15)",
+                color: "#facc15",
+                cursor: "pointer",
+                marginLeft: "4px",
+              }}
+            >
+              ⚠️ {errors.length} {errors.length === 1 ? "warning" : "warnings"}
+            </span>
+          )}
         </div>
         <div className="pi-openui-actions">
           <button
@@ -125,9 +145,21 @@ export function OpenUIBlockComponent({ language, source }: OpenUIBlockProps) {
       </div>
 
       {showSource ? (
-        <pre className="pi-openui-source">
-          <code>{code}</code>
-        </pre>
+        <div className="pi-openui-source-view">
+          <pre className="pi-openui-source">
+            <code>{code}</code>
+          </pre>
+          {errors.length > 0 && (
+            <div className="pi-openui-errors" style={{ margin: "8px 12px 12px" }}>
+              <div style={{ fontWeight: 600, marginBottom: "4px" }}>Syntax / Schema Diagnostics:</div>
+              {errors.map((err, i) => (
+                <div key={i} className="pi-openui-error-item">
+                  • {err}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       ) : (
         <div className="pi-openui-content">
           <OpenUIErrorBoundary
@@ -146,15 +178,6 @@ export function OpenUIBlockComponent({ language, source }: OpenUIBlockProps) {
               onError={handleError}
             />
           </OpenUIErrorBoundary>
-          {errors.length > 0 && (
-            <div className="pi-openui-errors">
-              {errors.map((err, i) => (
-                <div key={i} className="pi-openui-error-item">
-                  {err}
-                </div>
-              ))}
-            </div>
-          )}
         </div>
       )}
     </div>
