@@ -1,24 +1,18 @@
-import { createLibrary } from "@openuidev/react-lang"
-import { chartComponents } from "./chart"
-import { controlComponents } from "./controls"
-import { functions } from "./functions"
-import { layoutComponents } from "./layout"
-import { Lesson } from "./lesson"
-import { scene3dComponents } from "./scene3d"
-import { svgComponents } from "./svg"
-import { textComponents } from "./text"
+import { openuiLibrary } from "@openuidev/react-ui/genui-lib";
+import { createLibrary } from "@openuidev/react-lang";
+import { Lesson } from "./lesson";
+import { Scene3D } from "./scene3d";
 
+// Standard OpenUI component library built on the official @openuidev/react-ui catalog
 export const renderLibrary = createLibrary({
-  root: "Lesson",
-  components: [Lesson, ...layoutComponents, ...textComponents, ...controlComponents, ...svgComponents, ...chartComponents, ...scene3dComponents],
-  functions,
-})
+  root: "Stack",
+  components: [
+    ...Object.values(openuiLibrary.components),
+    Lesson,
+    Scene3D,
+  ],
+});
 
-export * from "./chart"
-export * from "./controls"
-export * from "./functions"
-export * from "./layout"
-export * from "./lesson"
-export * from "./scene3d"
-export * from "./svg"
-export * from "./text"
+export { openuiLibrary };
+export * from "./lesson";
+export * from "./scene3d";

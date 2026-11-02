@@ -4,6 +4,8 @@ import { renderLibrary } from "./library/index";
 import { extractOpenUILang } from "./extract-openui";
 import { OpenUIIcon } from "./icon";
 import katexCss from "katex/dist/katex-woff2.min.css?inline";
+import openuiCss from "@openuidev/react-ui/index.css?inline";
+import defaultsCss from "@openuidev/react-ui/defaults.css?inline";
 import panelCss from "./library/panel.css?inline";
 import blockCss from "./renderer.css?inline";
 
@@ -242,9 +244,9 @@ export function OpenUIComposerControl({ position }: { position?: string }) {
 export function onLoad(pi: any) {
   host = pi;
 
-  // 1. Inject KaTeX, OpenUI component, and block renderer styles
+  // 1. Inject KaTeX, official @openuidev/react-ui component styling, and block renderer styles
   if (pi.ui && typeof pi.ui.injectStyle === "function") {
-    pi.ui.injectStyle([katexCss, panelCss, blockCss].join("\n\n"));
+    pi.ui.injectStyle([katexCss, defaultsCss, openuiCss, panelCss, blockCss].join("\n\n"));
   }
 
   // 2. Register blockRenderer for local.openui-render:openui

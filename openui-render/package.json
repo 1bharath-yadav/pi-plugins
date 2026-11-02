@@ -9,6 +9,7 @@
   "dependencies": {
     "@openuidev/lang-core": "1.0.2",
     "@openuidev/react-lang": "1.0.2",
+    "@openuidev/react-ui": "^0.18.1",
     "katex": "0.16.47",
     "zod": "4.1.8"
   },

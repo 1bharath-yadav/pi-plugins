@@ -3,51 +3,61 @@ import { createParser } from "@openuidev/lang-core";
 import { renderLibrary } from "../src/library/index";
 
 describe("OpenUI Lang Component Library & Parser", () => {
-  it("parses and validates a complete Lesson program", () => {
+  it("parses and validates default Stack-based OpenUI programs", () => {
     const program = [
-      'xs = @Linspace(-4, 4, 41)',
-      'root = Lesson("Quadratic functions", "Connect the equation, the graph, and the vertex.", [',
-      '  Row([Badge("Mathematics", "purple"), Badge("Function graph", "success")], 2, "center", "start", true),',
-      '  Math("f(x) = x^2 - 4x + 3"),',
-      '  Markdown("Factor the polynomial to find its roots. The vertex identifies the minimum of this upward-opening parabola."),',
-      '  Chart("line", @Each(xs, "x", {x: x, y: x * x - 4 * x + 3}), "x", ["y"], "x", "f(x)", 260),',
-      '  Card([Title("Key property", "lg"), Text("The vertex is at x = 2; the minimum value is -1.")], "soft")',
-      '])',
+      'root = Stack([title, chart, tbl])',
+      'title = TextContent("Q4 Performance", "large-heavy")',
+      'chart = BarChart(labels, [s1], "grouped")',
+      'labels = ["Oct", "Nov", "Dec"]',
+      's1 = Series("Revenue", [100, 150, 200])',
+      'tbl = Table([Col("Month", labels), Col("Revenue", [100, 150, 200])])',
     ].join("\n");
 
     const parser = createParser(renderLibrary.toJSONSchema(), renderLibrary.root);
     const result = parser.parse(program);
     expect(result.meta.errors).toEqual([]);
     expect(result.root).toBeDefined();
-    expect(result.root?.typeName).toBe("Lesson");
+    expect(result.root?.typeName).toBe("Stack");
   });
 
-  it("supports interactive controls (Slider, SegmentedControl, Quiz)", () => {
+  it("supports Form, FormControl, Input, and Buttons", () => {
     const program = [
-      'val = 5',
-      'opt = "A"',
-      'root = Lesson("Interactive Controls", "Testing interactivity", [',
-      '  Slider(val, 0, 10, 1, "Scale factor"),',
-      '  SegmentedControl(opt, ["A", "B", "C"]),',
-      '  Quiz("What is the slope of y = 2x + 1?", ["1", "2", "3"], 1, "The coefficient of x is the slope.")',
-      '])',
+      'root = Stack([title, form])',
+      'title = TextContent("Account Settings", "large-heavy")',
+      'form = Form("settings", btns, [nameField, emailField])',
+      'nameField = FormControl("Full Name", Input("name", "Enter name", "text"))',
+      'emailField = FormControl("Email Address", Input("email", "you@example.com", "email"))',
+      'btns = Buttons([Button("Save Changes", @ToAssistant("Save"), "primary")])',
     ].join("\n");
 
     const parser = createParser(renderLibrary.toJSONSchema(), renderLibrary.root);
     const result = parser.parse(program);
     expect(result.meta.errors).toEqual([]);
-    expect(result.root?.typeName).toBe("Lesson");
+    expect(result.root?.typeName).toBe("Stack");
   });
 
-  it("supports 3D spatial scenes (Scene3D)", () => {
+  it("supports conversational Card containers", () => {
     const program = [
-      'pts = [{x: 0, y: 0, z: 0}, {x: 1, y: 1, z: 1}]',
+      'root = Card([header, callout])',
+      'header = CardHeader("System Notice", "Operational")',
+      'callout = Callout("info", "All systems normal", "All agents operational.")',
+    ].join("\n");
+
+    const parser = createParser(renderLibrary.toJSONSchema(), "Card");
+    const result = parser.parse(program);
+    expect(result.meta.errors).toEqual([]);
+    expect(result.root?.typeName).toBe("Card");
+  });
+
+  it("supports 3D spatial scenes (Scene3D) and Lesson for backwards compatibility", () => {
+    const program = [
+      'pts = [{x: 0, y: 0, z: 0, label: "Center"}, {x: 1, y: 1, z: 1, label: "Target"}]',
       'root = Lesson("3D Geometry", "Visualize points in 3D", [',
       '  Scene3D(pts, { w: [0, 1, 0], b: 0 }, 45, 30)',
       '])',
     ].join("\n");
 
-    const parser = createParser(renderLibrary.toJSONSchema(), renderLibrary.root);
+    const parser = createParser(renderLibrary.toJSONSchema(), "Lesson");
     const result = parser.parse(program);
     expect(result.meta.errors).toEqual([]);
     expect(result.root?.typeName).toBe("Lesson");
