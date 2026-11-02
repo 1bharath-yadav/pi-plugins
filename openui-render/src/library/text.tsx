@@ -71,7 +71,7 @@ export const Caption = defineComponent({
 
 export const BadgeProps = z.object({
   text: z.string(),
-  color: z.enum(["neutral", "info", "success", "warning", "danger", "purple", "pink"]).optional(),
+  color: z.string().optional(),
 })
 export const Badge = defineComponent({
   name: "Badge",
@@ -125,7 +125,7 @@ export const ListItem = defineComponent({
 
 export const ListProps = z.object({
   items: z.array(z.union([z.string(), ListItem.ref])),
-  marker: z.enum(["bullet", "number", "none"]).optional(),
+  marker: z.string().optional(),
   timeline: z.boolean().optional(),
 })
 export const List = defineComponent({

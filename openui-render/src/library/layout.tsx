@@ -16,13 +16,18 @@ const flexStyle = (p: FlexProps, column = false): CSSProperties => ({
   textAlign: column && (p.align === "center" || p.align === "end") ? p.align : undefined,
 })
 
-export const ColProps = z.object({ children, gap: z.number().optional(), align: align.optional() })
+export const ColProps = z.object({
+  children,
+  gap: z.number().optional(),
+  align: align.optional(),
+  justify: justify.optional(),
+})
 export const Col = defineComponent({
   name: "Col",
   props: ColProps,
-  description: "Vertical layout. Without gap it spaces blocks like an article.",
+  description: "Vertical layout; items stack in order.",
   component: ({ props, renderNode }) => (
-    <div className={cx("olr-col", props.gap == null && "olr-flow")} style={flexStyle(props, true)}>
+    <div className="olr-col" style={flexStyle(props, true)}>
       {renderNode(props.children)}
     </div>
   ),
@@ -59,11 +64,18 @@ export const Grid = defineComponent({
   component: ({ props, renderNode }) => {
     const columns = Math.min(6, Math.max(1, Math.round(props.columns ?? 2)))
     const gap = space(props.gap) ?? "12px"
-    const min = props.minChildWidth ? `max(${Math.min(600, Math.max(0, props.minChildWidth))}px, (100% - ${columns - 1} * ${gap}) / ${columns})` : null
+    const min = props.minChildWidth
+      ? `max(${Math.min(600, Math.max(0, props.minChildWidth))}px, calc((100% - ${columns - 1} * ${gap}) / ${columns}))`
+      : null
     return (
       <div
         className="olr-grid"
-        style={{ gap, gridTemplateColumns: min ? `repeat(auto-fill, minmax(min(100%, ${min}), 1fr))` : `repeat(${columns}, minmax(0, 1fr))` }}
+        style={{
+          gap,
+          gridTemplateColumns: min
+            ? `repeat(auto-fill, minmax(min(100%, ${min}), 1fr))`
+            : `repeat(${columns}, minmax(0, 1fr))`,
+        }}
       >
         {renderNode(props.children)}
       </div>
@@ -73,7 +85,7 @@ export const Grid = defineComponent({
 
 export const CardProps = z.object({
   children,
-  variant: z.enum(["outline", "soft"]).optional(),
+  variant: z.string().optional(),
   padding: z.number().optional(),
   gap: z.number().optional(),
 })
@@ -95,7 +107,7 @@ export const DividerProps = z.object({})
 export const Divider = defineComponent({
   name: "Divider",
   props: DividerProps,
-  description: "A thin horizontal rule between sections.",
+  description: "Thin horizontal line separating sections.",
   component: () => <hr className="olr-divider" />,
 })
 

@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback, useEffect } from "react";
+import React, { useState, useMemo, useCallback, useEffect, Component, type ReactNode } from "react";
 import { Renderer } from "@openuidev/react-lang";
 import { renderLibrary } from "./library/index";
 import { extractOpenUILang } from "./extract-openui";
@@ -8,6 +8,43 @@ import panelCss from "./library/panel.css?inline";
 import blockCss from "./renderer.css?inline";
 
 let host: any = null;
+
+interface ErrorBoundaryProps {
+  children: ReactNode;
+  fallback?: (error: Error) => ReactNode;
+}
+
+interface ErrorBoundaryState {
+  error: Error | null;
+}
+
+class OpenUIErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
+  state: ErrorBoundaryState = { error: null };
+
+  static getDerivedStateFromError(error: Error): ErrorBoundaryState {
+    return { error };
+  }
+
+  componentDidCatch(error: Error) {
+    console.warn("[OpenUI] Render error caught by OpenUIErrorBoundary:", error);
+  }
+
+  render(): ReactNode {
+    if (this.state.error) {
+      if (this.props.fallback) {
+        return this.props.fallback(this.state.error);
+      }
+      return (
+        <div className="pi-openui-errors">
+          <div className="pi-openui-error-item">
+            <strong>Render exception:</strong> {this.state.error?.message || String(this.state.error)}
+          </div>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
 
 export interface OpenUIBlockProps {
   language: string;
@@ -22,7 +59,7 @@ export function OpenUIBlockComponent({ language, source }: OpenUIBlockProps) {
   const code = useMemo(() => {
     let text = (source || "").trim();
     if (text.startsWith("```")) {
-      text = text.replace(/^```[^\n]*\r?\n/, "").replace(/```$/, "").trim();
+      text = text.replace(/^```[^\n]*\r?\n/, "").replace(/```[ \t\r\n]*$/, "").trim();
     }
     return text;
   }, [source]);
@@ -91,11 +128,22 @@ export function OpenUIBlockComponent({ language, source }: OpenUIBlockProps) {
         </pre>
       ) : (
         <div className="pi-openui-content">
-          <Renderer
-            response={code}
-            library={renderLibrary}
-            onError={handleError}
-          />
+          <OpenUIErrorBoundary
+            fallback={(err) => (
+              <div className="pi-openui-errors">
+                <div className="pi-openui-error-item">
+                  <strong>Render notice:</strong> {err?.message || String(err)}
+                </div>
+              </div>
+            )}
+          >
+            <Renderer
+              key={code}
+              response={code}
+              library={renderLibrary}
+              onError={handleError}
+            />
+          </OpenUIErrorBoundary>
           {errors.length > 0 && (
             <div className="pi-openui-errors">
               {errors.map((err, i) => (
@@ -165,7 +213,7 @@ export function OpenUIComposerControl({ position }: { position?: string }) {
           args: { enabled: nextState },
         });
 
-        // If toggled ON, insert /openui command prompt if composer is empty
+        // If toggled ON, insert /openui command prompt into composer
         if (nextState) {
           await host.dispatch("composer.insertText", {
             text: "/openui ",

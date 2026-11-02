@@ -9,6 +9,9 @@
   font-family: inherit;
   color: var(--text-normal, #e4e4e7);
   transition: border-color 0.15s ease;
+  max-height: 2800px;
+  display: flex;
+  flex-direction: column;
 }
 
 .pi-openui-card:hover {
@@ -22,6 +25,7 @@
   padding: 6px 12px;
   border-bottom: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.08));
   background: var(--bg-header, rgba(255, 255, 255, 0.03));
+  flex-shrink: 0;
 }
 
 .pi-openui-tag {
@@ -67,6 +71,8 @@
   padding: 12px 14px;
   max-width: 100%;
   overflow-x: auto;
+  overflow-y: auto;
+  max-height: 2700px;
 }
 
 .pi-openui-source {
@@ -78,6 +84,8 @@
   line-height: 1.5;
   color: #e4e4e7;
   overflow-x: auto;
+  overflow-y: auto;
+  max-height: 2700px;
   white-space: pre-wrap;
 }
 
