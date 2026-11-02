@@ -2,20 +2,37 @@ import React from "react";
 import { openuiLibrary } from "@openuidev/react-ui/genui-lib";
 import { createLibrary, defineComponent } from "@openuidev/react-lang";
 import { z } from "zod/v4";
-import { Steps as OpenUISteps, StepsItem as OpenUIStepsItem } from "@openuidev/react-ui/Steps";
-import { CodeBlock as OpenUICodeBlock } from "@openuidev/react-ui/CodeBlock";
-import { MarkDownRenderer } from "@openuidev/react-ui/MarkDownRenderer";
+import {
+  CodeBlock as OpenUICodeBlock,
+  Steps as OpenUISteps,
+  StepsItem as OpenUIStepsItem,
+  MarkDownRenderer,
+  ImageBlock as OpenUIImageBlock,
+  TagBlock as OpenUITagBlock,
+  Tag as OpenUITag,
+  Carousel as OpenUICarousel,
+  ListBlock as OpenUIListBlock,
+  ListItem as OpenUIListItem,
+  EntityList as OpenUIEntityList,
+  RadioGroup as OpenUIRadioGroup,
+  RadioItem as OpenUIRadioItem,
+  CheckBoxGroup as OpenUICheckBoxGroup,
+  SwitchGroup as OpenUISwitchGroup,
+  Slider as OpenUISlider,
+  MetricIndicatorInline as OpenUIMetricIndicatorInline,
+  MetricIndicatorWithStrikethrough as OpenUIMetricIndicatorWithStrikethrough,
+} from "@openuidev/react-ui";
 import { Lesson } from "./lesson";
 import { Scene3D } from "./scene3d";
 
-// 1. Resilient CodeBlock supporting CodeBlock(code) or CodeBlock(language, code)
+// 1. Resilient CodeBlock: CodeBlock(code) or CodeBlock(language, code)
 export const CodeBlock = defineComponent({
   name: "CodeBlock",
   props: z.object({
     language: z.string().optional(),
     codeString: z.string().optional(),
   }),
-  description: "Syntax-highlighted code block. CodeBlock(code) or CodeBlock(language, code)",
+  description: "Syntax-highlighted code block. Usage: CodeBlock(code) or CodeBlock(language, code)",
   component: ({ props }) => {
     const code = props.codeString ?? props.language ?? "";
     const lang = props.codeString ? (props.language ?? "text") : "text";
@@ -45,7 +62,7 @@ export const Step = defineComponent({
   component: () => null,
 });
 
-// 3. Resilient Steps & Stepper
+// 3. Resilient Steps & Stepper: Steps(items) or Steps(title, items)
 function renderSteps({ props, renderNode }: { props: any; renderNode: any }) {
   let items: any[] = [];
   let title: string | null = null;
@@ -93,18 +110,18 @@ const createStepsSchema = () =>
 export const Steps = defineComponent({
   name: "Steps",
   props: createStepsSchema(),
-  description: "Step-by-step process guide. Steps(items) or Steps(title, items)",
+  description: "Step-by-step process guide. Usage: Steps(items) or Steps(title, items)",
   component: renderSteps,
 });
 
 export const Stepper = defineComponent({
   name: "Stepper",
   props: createStepsSchema(),
-  description: "Alias for Steps. Stepper(items) or Stepper(title, items)",
+  description: "Alias for Steps. Usage: Stepper(items) or Stepper(title, items)",
   component: renderSteps,
 });
 
-// 4. Resilient Card supporting Card([children]), Card(header, [children]), or Card(singleChild)
+// 4. Resilient Card: Card([children]), Card(header, [children]), or Card(singleChild)
 export const Card = defineComponent({
   name: "Card",
   props: z.object({
@@ -149,7 +166,7 @@ export const Card = defineComponent({
   },
 });
 
-// 5. Resilient Text supporting Text(value) or Text(variant, value, subtext?)
+// 5. Resilient Text: Text(value) or Text(variant, value, subtext?)
 export const Text = defineComponent({
   name: "Text",
   props: z.object({
@@ -170,7 +187,7 @@ export const Text = defineComponent({
   },
 });
 
-// 6. Resilient Slider supporting Slider(name, min, max, step?, label?)
+// 6. Resilient Slider: Slider(name, min, max, step?, label?)
 export const Slider = defineComponent({
   name: "Slider",
   props: z.object({
@@ -240,7 +257,7 @@ export const Form = defineComponent({
   ),
 });
 
-// 8. Resilient RadioItem
+// 8. Resilient RadioItem & RadioGroup
 export const RadioItem = defineComponent({
   name: "RadioItem",
   props: z.object({
@@ -252,52 +269,93 @@ export const RadioItem = defineComponent({
   component: () => null,
 });
 
-// 9. Aliases: Header, Divider, ScatterPoint, MarkdownContent
-export const Header = defineComponent({
-  name: "Header",
+export const RadioGroup = defineComponent({
+  name: "RadioGroup",
   props: z.object({
-    title: z.union([z.string(), z.any()]),
-    subtitle: z.string().optional(),
+    name: z.any().optional(),
+    items: z.any().optional(),
+    defaultValue: z.any().optional(),
   }),
-  description: "Header section with title: Header(title, subtitle?)",
-  component: ({ props }) => (
-    <div style={{ marginBottom: "12px" }}>
-      <h3 style={{ fontSize: "16px", fontWeight: 700, margin: "0 0 4px 0", color: "#f4f4f5" }}>
-        {typeof props.title === "string" ? props.title : ""}
-      </h3>
-      {props.subtitle && <p style={{ fontSize: "12px", color: "#a1a1aa", margin: 0 }}>{props.subtitle}</p>}
-    </div>
-  ),
+  description: "Radio group: RadioGroup(name, items, defaultValue?)",
+  component: ({ props, renderNode }) => {
+    let items = Array.isArray(props.items) ? props.items : Array.isArray(props.name) ? props.name : [];
+    let groupName = typeof props.name === "string" ? props.name : "radio-group";
+    let defaultVal = Array.isArray(props.defaultValue) ? props.defaultValue[0] : (props.defaultValue ?? "");
+
+    return (
+      <div role="radiogroup" style={{ display: "flex", flexDirection: "column", gap: "8px", margin: "8px 0" }}>
+        {items.map((it: any, idx: number) => {
+          const itemProps = it?.props ?? it ?? {};
+          const label = itemProps.label ?? `Choice ${idx + 1}`;
+          const val = itemProps.value ?? label;
+          return (
+            <label key={idx} style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "13px", color: "#e4e4e7", cursor: "pointer" }}>
+              <input type="radio" name={groupName} value={val} defaultChecked={val === defaultVal} style={{ accentColor: "#9333ea" }} />
+              <div>
+                <div>{label}</div>
+                {itemProps.description && <div style={{ fontSize: "11px", color: "#a1a1aa" }}>{itemProps.description}</div>}
+              </div>
+            </label>
+          );
+        })}
+      </div>
+    );
+  },
 });
 
-export const Divider = defineComponent({
-  name: "Divider",
-  props: z.object({}).optional(),
-  description: "Horizontal divider line",
-  component: () => <hr style={{ border: "none", borderTop: "1px solid rgba(255, 255, 255, 0.1)", margin: "14px 0" }} />,
-});
-
-export const ScatterPoint = defineComponent({
-  name: "ScatterPoint",
+// 9. Resilient CheckBoxGroup & SwitchGroup
+export const CheckBoxGroup = defineComponent({
+  name: "CheckBoxGroup",
   props: z.object({
-    x: z.number(),
-    y: z.number(),
-    label: z.any().optional(),
+    name: z.any().optional(),
+    items: z.any().optional(),
+    defaultValue: z.any().optional(),
   }),
-  description: "Scatter plot point: ScatterPoint(x, y, label?)",
-  component: () => null,
+  description: "Checkbox group: CheckBoxGroup(name, items)",
+  component: ({ props, renderNode }) => {
+    let items = Array.isArray(props.items) ? props.items : Array.isArray(props.name) ? props.name : [];
+    return (
+      <div style={{ display: "flex", flexDirection: "column", gap: "8px", margin: "8px 0" }}>
+        {items.map((it: any, idx: number) => {
+          const p = it?.props ?? it ?? {};
+          return (
+            <label key={idx} style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "13px", color: "#e4e4e7", cursor: "pointer" }}>
+              <input type="checkbox" defaultChecked={Boolean(p.checked)} style={{ accentColor: "#9333ea" }} />
+              <span>{p.label ?? `Item ${idx + 1}`}</span>
+            </label>
+          );
+        })}
+      </div>
+    );
+  },
 });
 
-export const MarkdownContent = defineComponent({
-  name: "MarkdownContent",
+export const SwitchGroup = defineComponent({
+  name: "SwitchGroup",
   props: z.object({
-    text: z.string(),
+    name: z.any().optional(),
+    items: z.any().optional(),
   }),
-  description: "Markdown text block: MarkdownContent(text)",
-  component: ({ props }) => <MarkDownRenderer textMarkdown={props.text} />,
+  description: "Switch group: SwitchGroup(name, items)",
+  component: ({ props, renderNode }) => {
+    let items = Array.isArray(props.items) ? props.items : Array.isArray(props.name) ? props.name : [];
+    return (
+      <div style={{ display: "flex", flexDirection: "column", gap: "8px", margin: "8px 0" }}>
+        {items.map((it: any, idx: number) => {
+          const p = it?.props ?? it ?? {};
+          return (
+            <label key={idx} style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "13px", color: "#e4e4e7", cursor: "pointer" }}>
+              <input type="checkbox" role="switch" defaultChecked={Boolean(p.checked)} style={{ accentColor: "#9333ea" }} />
+              <span>{p.label ?? `Switch ${idx + 1}`}</span>
+            </label>
+          );
+        })}
+      </div>
+    );
+  },
 });
 
-// 10. Resilient SectionBlock & SectionItem
+// 10. Resilient SectionBlock & SectionItem: SectionBlock(sections) or SectionBlock(title, sections, isFoldable?)
 const SectionItemSchema = z.object({
   trigger: z.union([z.string(), z.any()]).optional(),
   title: z.union([z.string(), z.any()]).optional(),
@@ -315,9 +373,9 @@ export const SectionItem = defineComponent({
 export const SectionBlock = defineComponent({
   name: "SectionBlock",
   props: z.object({
-    title: z.union([z.string(), z.array(z.any())]).optional(),
-    sections: z.union([z.array(z.any()), z.any()]).optional(),
-    isFoldable: z.boolean().optional(),
+    title: z.any().optional(),
+    sections: z.any().optional(),
+    isFoldable: z.any().optional(),
   }),
   description: "Sections container: SectionBlock(sections) or SectionBlock(title, sections)",
   component: ({ props, renderNode }) => {
@@ -325,6 +383,8 @@ export const SectionBlock = defineComponent({
       ? props.sections
       : Array.isArray(props.title)
       ? props.title
+      : Array.isArray(props.isFoldable)
+      ? props.isFoldable
       : props.sections
       ? [props.sections]
       : [];
@@ -360,7 +420,277 @@ export const SectionBlock = defineComponent({
   },
 });
 
-// 11. Resilient Badge, Metric, StatCard
+// 11. Resilient Carousel: supports single components or arrays of components per slide
+export const Carousel = defineComponent({
+  name: "Carousel",
+  props: z.object({
+    children: z.array(z.any()),
+    loop: z.boolean().optional(),
+  }),
+  description: "Swipeable carousel slides: Carousel([slide1, slide2])",
+  component: ({ props, renderNode }) => {
+    const slides = props.children ?? [];
+    return (
+      <div className="openui-carousel-wrap" style={{ display: "flex", gap: "12px", overflowX: "auto", padding: "8px 0" }}>
+        {slides.map((s: any, idx: number) => (
+          <div key={idx} style={{ flex: "0 0 85%", borderRadius: "8px", background: "rgba(255, 255, 255, 0.04)", border: "1px solid rgba(255, 255, 255, 0.08)", padding: "12px" }}>
+            {Array.isArray(s) ? renderNode(s) : renderNode([s])}
+          </div>
+        ))}
+      </div>
+    );
+  },
+});
+
+// 12. Resilient TagBlock & Tag
+export const Tag = defineComponent({
+  name: "Tag",
+  props: z.object({
+    text: z.union([z.string(), z.any()]),
+    icon: z.any().optional(),
+    size: z.any().optional(),
+    variant: z.string().optional(),
+  }),
+  description: "Small tag pill: Tag(text, icon?, size?, variant?)",
+  component: ({ props }) => (
+    <span style={{ display: "inline-flex", alignItems: "center", gap: "4px", padding: "2px 8px", borderRadius: "12px", fontSize: "11px", background: "rgba(255, 255, 255, 0.08)", color: "#e4e4e7" }}>
+      {String(props.text ?? "")}
+    </span>
+  ),
+});
+
+export const TagBlock = defineComponent({
+  name: "TagBlock",
+  props: z.object({
+    items: z.union([z.array(z.any()), z.string()]),
+  }),
+  description: "Block of tags: TagBlock(items)",
+  component: ({ props, renderNode }) => {
+    let items = Array.isArray(props.items)
+      ? props.items
+      : typeof props.items === "string"
+      ? props.items.split(",").map((s) => s.trim())
+      : [];
+    return (
+      <div style={{ display: "flex", flexWrap: "wrap", gap: "6px", margin: "6px 0" }}>
+        {items.map((it: any, idx: number) => (
+          <span key={idx} style={{ display: "inline-flex", padding: "2px 8px", borderRadius: "12px", fontSize: "11px", background: "rgba(255, 255, 255, 0.08)", color: "#e4e4e7" }}>
+            {typeof it === "string" ? it : renderNode(it)}
+          </span>
+        ))}
+      </div>
+    );
+  },
+});
+
+// 13. Resilient ImageBlock: ImageBlock(src, alt, caption?)
+export const ImageBlock = defineComponent({
+  name: "ImageBlock",
+  props: z.object({
+    src: z.string(),
+    alt: z.string(),
+    caption: z.any().optional(),
+  }),
+  description: "Framed image: ImageBlock(src, alt, caption?)",
+  component: ({ props }) => (
+    <div style={{ margin: "10px 0" }}>
+      <img src={props.src} alt={props.alt} style={{ maxWidth: "100%", borderRadius: "8px", display: "block" }} />
+      {props.caption && <p style={{ fontSize: "11px", color: "#a1a1aa", marginTop: "4px" }}>{String(props.caption)}</p>}
+    </div>
+  ),
+});
+
+// 14. Resilient ListBlock: ListBlock(items, variant?)
+export const ListBlock = defineComponent({
+  name: "ListBlock",
+  props: z.object({
+    items: z.any(),
+    variant: z.string().optional(),
+  }),
+  description: "List of items: ListBlock(items, variant?)",
+  component: ({ props, renderNode }) => {
+    let items = Array.isArray(props.items) ? props.items : [];
+    const isNumbered = props.variant === "number" || props.variant === "numbered";
+    return (
+      <div style={{ display: "flex", flexDirection: "column", gap: "8px", margin: "8px 0" }}>
+        {items.map((it: any, idx: number) => {
+          const p = it?.props ?? it ?? {};
+          return (
+            <div key={idx} style={{ display: "flex", gap: "10px", alignItems: "flex-start" }}>
+              {isNumbered && (
+                <span style={{ width: "20px", height: "20px", borderRadius: "50%", background: "rgba(255, 255, 255, 0.1)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "11px", fontWeight: 600, flexShrink: 0 }}>
+                  {idx + 1}
+                </span>
+              )}
+              <div style={{ flex: 1 }}>
+                <div style={{ fontWeight: 600, fontSize: "13px", color: "#f4f4f5" }}>{p.title ?? (typeof it === "string" ? it : "")}</div>
+                {p.description && <div style={{ fontSize: "12px", color: "#a1a1aa", marginTop: "2px" }}>{String(p.description)}</div>}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    );
+  },
+});
+
+// 15. Resilient MetricIndicatorInline & MetricIndicatorWithStrikethrough
+export const MetricIndicatorInline = defineComponent({
+  name: "MetricIndicatorInline",
+  props: z.object({
+    value: z.any(),
+    subtext: z.any().optional(),
+    trend: z.any().optional(),
+  }),
+  description: "Inline KPI metric with optional trend: MetricIndicatorInline(value, subtext?, trend?)",
+  component: ({ props }) => (
+    <div style={{ display: "inline-flex", alignItems: "baseline", gap: "8px" }}>
+      <span style={{ fontSize: "16px", fontWeight: 700, color: "#f4f4f5" }}>{String(props.value)}</span>
+      {props.subtext && <span style={{ fontSize: "12px", color: "#a1a1aa" }}>{String(props.subtext)}</span>}
+      {props.trend && (
+        <span style={{ fontSize: "11px", color: "#22c55e", fontWeight: 600 }}>
+          {typeof props.trend === "string" ? props.trend : props.trend?.value ?? ""}
+        </span>
+      )}
+    </div>
+  ),
+});
+
+export const MetricIndicatorWithStrikethrough = defineComponent({
+  name: "MetricIndicatorWithStrikethrough",
+  props: z.object({
+    value: z.any(),
+    previousValue: z.any().optional(),
+    trend: z.any().optional(),
+  }),
+  description: "Metric showing previous and current values",
+  component: ({ props }) => (
+    <div style={{ display: "inline-flex", alignItems: "baseline", gap: "8px" }}>
+      {props.previousValue && <span style={{ textDecoration: "line-through", color: "#71717a", fontSize: "13px" }}>{String(props.previousValue)}</span>}
+      <span style={{ fontSize: "16px", fontWeight: 700, color: "#f4f4f5" }}>{String(props.value)}</span>
+    </div>
+  ),
+});
+
+// 16. Resilient CompositeCardItem & CompositeCardBlock
+export const CompositeCardItem = defineComponent({
+  name: "CompositeCardItem",
+  props: z.object({
+    id: z.any().optional(),
+    header: z.any().optional(),
+    body: z.any().optional(),
+    footer: z.any().optional(),
+  }),
+  description: "Composite card item: CompositeCardItem(id, header, body, footer?)",
+  component: () => null,
+});
+
+export const CompositeCardBlock = defineComponent({
+  name: "CompositeCardBlock",
+  props: z.object({
+    items: z.array(z.any()),
+    layout: z.any().optional(),
+    responsive: z.any().optional(),
+    action: z.any().optional(),
+    gap: z.any().optional(),
+  }),
+  description: "Comparison card grid: CompositeCardBlock(items)",
+  component: ({ props, renderNode }) => {
+    const items = props.items ?? [];
+    return (
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: "12px", margin: "12px 0" }}>
+        {items.map((it: any, idx: number) => {
+          const p = it?.props ?? it ?? {};
+          return (
+            <div key={idx} style={{ padding: "14px", borderRadius: "8px", background: "rgba(255, 255, 255, 0.04)", border: "1px solid rgba(255, 255, 255, 0.1)", display: "flex", flexDirection: "column", gap: "8px" }}>
+              {p.header && (
+                <div style={{ fontWeight: 600, fontSize: "14px", color: "#f4f4f5" }}>
+                  {typeof p.header === "string" ? p.header : renderNode(p.header)}
+                </div>
+              )}
+              {p.body && <div style={{ flex: 1 }}>{Array.isArray(p.body) ? renderNode(p.body) : renderNode([p.body])}</div>}
+              {p.footer && <div>{renderNode([p.footer?.button ?? p.footer])}</div>}
+            </div>
+          );
+        })}
+      </div>
+    );
+  },
+});
+
+// 17. Resilient EntityList
+export const EntityList = defineComponent({
+  name: "EntityList",
+  props: z.object({
+    rows: z.array(z.any()).default([]),
+    size: z.any().optional(),
+    header: z.any().optional(),
+    footer: z.any().optional(),
+  }),
+  description: "Two-column label/value list: EntityList(rows, size?, header?, footer?)",
+  component: ({ props }) => {
+    const rows = props.rows ?? [];
+    return (
+      <div style={{ margin: "8px 0", fontSize: "13px" }}>
+        {props.header && <div style={{ fontWeight: 600, color: "#f4f4f5", marginBottom: "4px" }}>{String(props.header?.left ?? props.header)}</div>}
+        {rows.map((r: any, idx: number) => (
+          <div key={idx} style={{ display: "flex", justifyContent: "space-between", padding: "4px 0", borderBottom: "1px solid rgba(255, 255, 255, 0.05)" }}>
+            <span style={{ color: "#a1a1aa" }}>{String(r.left ?? "")}</span>
+            <span style={{ color: "#f4f4f5", fontWeight: 500 }}>{String(r.right ?? "")}</span>
+          </div>
+        ))}
+      </div>
+    );
+  },
+});
+
+// 18. Aliases: Header, Divider, ScatterPoint, MarkdownContent
+export const Header = defineComponent({
+  name: "Header",
+  props: z.object({
+    title: z.union([z.string(), z.any()]),
+    subtitle: z.any().optional(),
+  }),
+  description: "Header section with title: Header(title, subtitle?)",
+  component: ({ props }) => (
+    <div style={{ marginBottom: "12px" }}>
+      <h3 style={{ fontSize: "16px", fontWeight: 700, margin: "0 0 4px 0", color: "#f4f4f5" }}>
+        {typeof props.title === "string" ? props.title : ""}
+      </h3>
+      {props.subtitle && <p style={{ fontSize: "12px", color: "#a1a1aa", margin: 0 }}>{String(props.subtitle)}</p>}
+    </div>
+  ),
+});
+
+export const Divider = defineComponent({
+  name: "Divider",
+  props: z.object({}).optional(),
+  description: "Horizontal divider line",
+  component: () => <hr style={{ border: "none", borderTop: "1px solid rgba(255, 255, 255, 0.1)", margin: "14px 0" }} />,
+});
+
+export const ScatterPoint = defineComponent({
+  name: "ScatterPoint",
+  props: z.object({
+    x: z.number(),
+    y: z.number(),
+    label: z.any().optional(),
+  }),
+  description: "Scatter plot point: ScatterPoint(x, y, label?)",
+  component: () => null,
+});
+
+export const MarkdownContent = defineComponent({
+  name: "MarkdownContent",
+  props: z.object({
+    text: z.string(),
+    extra: z.any().optional(),
+  }),
+  description: "Markdown text block: MarkdownContent(text, extra?)",
+  component: ({ props }) => <MarkDownRenderer textMarkdown={props.text} />,
+});
+
+// 19. Resilient Badge, Metric, StatCard
 export const Badge = defineComponent({
   name: "Badge",
   props: z.object({
@@ -440,6 +770,19 @@ delete baseComponents.Slider;
 delete baseComponents.FormControl;
 delete baseComponents.Form;
 delete baseComponents.RadioItem;
+delete baseComponents.RadioGroup;
+delete baseComponents.CheckBoxGroup;
+delete baseComponents.SwitchGroup;
+delete baseComponents.Carousel;
+delete baseComponents.TagBlock;
+delete baseComponents.Tag;
+delete baseComponents.ImageBlock;
+delete baseComponents.ListBlock;
+delete baseComponents.CompositeCardItem;
+delete baseComponents.CompositeCardBlock;
+delete baseComponents.EntityList;
+delete baseComponents.MetricIndicatorInline;
+delete baseComponents.MetricIndicatorWithStrikethrough;
 
 export const renderLibrary = createLibrary({
   root: "Stack",
@@ -451,6 +794,19 @@ export const renderLibrary = createLibrary({
     FormControl,
     Form,
     RadioItem,
+    RadioGroup,
+    CheckBoxGroup,
+    SwitchGroup,
+    Carousel,
+    TagBlock,
+    Tag,
+    ImageBlock,
+    ListBlock,
+    CompositeCardItem,
+    CompositeCardBlock,
+    EntityList,
+    MetricIndicatorInline,
+    MetricIndicatorWithStrikethrough,
     CodeBlock,
     Steps,
     Stepper,
