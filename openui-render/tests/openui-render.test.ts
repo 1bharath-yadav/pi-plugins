@@ -66,10 +66,42 @@ describe("OpenUI Lang Component Library & Parser", () => {
     expect(result.root?.typeName).toBe("Stack");
   });
 
-  it("supports conversational Card containers", () => {
+  it("supports Header, Divider, ScatterPoint, MarkdownContent, and flexible Slider/Text", () => {
     const program = [
-      'root = Card([header, callout])',
-      'header = CardHeader("System Notice", "Operational")',
+      'root = Stack([h, d, sl, txt, sp, md])',
+      'h = Header("System Architecture", "Overview of components")',
+      'd = Divider()',
+      'sl = Slider("threshold", 32, 100)',
+      'txt = Text("A compact plan for a small team.")',
+      'sp = ScatterPoint(10, 20, "Point A")',
+      'md = MarkdownContent("Markdown prose text here")',
+    ].join("\n");
+
+    const parser = createParser(renderLibrary.toJSONSchema(), renderLibrary.root);
+    const result = parser.parse(program);
+    expect(result.meta.errors).toEqual([]);
+    expect(result.root?.typeName).toBe("Stack");
+  });
+
+  it("supports SectionBlock, SectionItem, Badge, Metric, and StatCard", () => {
+    const program = [
+      'root = Stack([sec, b, m, sc])',
+      'sec = SectionBlock("Details", [item1])',
+      'item1 = SectionItem("Section 1", "Content of section 1")',
+      'b = Badge("Active", "success")',
+      'm = Metric(1250, "Total Users", "+12%")',
+      'sc = StatCard("Revenue", "$45,000", "+8%", "Compared to last month")',
+    ].join("\n");
+
+    const parser = createParser(renderLibrary.toJSONSchema(), renderLibrary.root);
+    const result = parser.parse(program);
+    expect(result.meta.errors).toEqual([]);
+    expect(result.root?.typeName).toBe("Stack");
+  });
+
+  it("supports conversational Card containers with string headers", () => {
+    const program = [
+      'root = Card("System Status", [callout])',
       'callout = Callout("info", "All systems normal", "All agents operational.")',
     ].join("\n");
 

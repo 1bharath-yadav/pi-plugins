@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useCallback, useEffect, Component, type ReactNode } from "react";
 import { Renderer } from "@openuidev/react-lang";
+import { ThemeProvider } from "@openuidev/react-ui";
 import { renderLibrary } from "./library/index";
 import { extractOpenUILang } from "./extract-openui";
 import { OpenUIIcon } from "./icon";
@@ -171,12 +172,14 @@ export function OpenUIBlockComponent({ language, source }: OpenUIBlockProps) {
               </div>
             )}
           >
-            <Renderer
-              key={code}
-              response={code}
-              library={renderLibrary}
-              onError={handleError}
-            />
+            <ThemeProvider mode="dark">
+              <Renderer
+                key={code}
+                response={code}
+                library={renderLibrary}
+                onError={handleError}
+              />
+            </ThemeProvider>
           </OpenUIErrorBoundary>
         </div>
       )}
@@ -269,7 +272,10 @@ export function onLoad(pi: any) {
 
   // 1. Inject KaTeX, official @openuidev/react-ui component styling, and block renderer styles
   if (pi.ui && typeof pi.ui.injectStyle === "function") {
-    pi.ui.injectStyle([katexCss, defaultsCss, openuiCss, panelCss, blockCss].join("\n\n"));
+    // Map :root to :scope and card classes so all variables resolve inside PI-Desktop's @scope
+    const openuiThemeCss = openuiCss.replace(/:root\b/g, ":scope, [data-pi-plugin], .pi-openui-card, .openui-card");
+    const defaultsThemeCss = defaultsCss.replace(/:root\b/g, ":scope, [data-pi-plugin], .pi-openui-card, .openui-card");
+    pi.ui.injectStyle([katexCss, defaultsThemeCss, openuiThemeCss, panelCss, blockCss].join("\n\n"));
   }
 
   // 2. Register blockRenderer for local.openui-render:openui

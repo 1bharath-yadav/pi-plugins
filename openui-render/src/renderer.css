@@ -1,10 +1,43 @@
+/* Ensure OpenUI CSS variables apply inside PI-Desktop's scoped container */
+[data-pi-plugin],
+.pi-openui-card,
+.openui-card,
+:scope {
+  --openui-background: #18181b;
+  --openui-foreground: #f4f4f5;
+  --openui-popover-background: #27272a;
+  --openui-border: rgba(255, 255, 255, 0.12);
+  --openui-border-default: rgba(255, 255, 255, 0.12);
+  --openui-border-interactive: rgba(255, 255, 255, 0.2);
+  --openui-border-accent: #a855f7;
+  --openui-interactive-accent-default: #9333ea;
+  --openui-interactive-accent-hover: #a855f7;
+  --openui-interactive-accent-pressed: #7e22ce;
+  --openui-text-accent-primary: #ffffff;
+  --openui-text-neutral-primary: #f4f4f5;
+  --openui-text-neutral-secondary: #a1a1aa;
+  --openui-text-neutral-tertiary: #71717a;
+  --openui-space-xs: 4px;
+  --openui-space-s: 8px;
+  --openui-space-s-m: 12px;
+  --openui-space-m: 16px;
+  --openui-space-l: 24px;
+  --openui-radius-s: 4px;
+  --openui-radius-m: 6px;
+  --openui-radius-l: 8px;
+  --openui-radius-xl: 12px;
+  --openui-highlight: rgba(255, 255, 255, 0.08);
+  --openui-shadow-m: 0 4px 12px rgba(0, 0, 0, 0.25);
+  --openui-font: var(--font-sans, system-ui, sans-serif);
+}
+
 /* Container for OpenUI interactive blocks inside conversation */
 .pi-openui-card {
   margin: 10px 0;
   border-radius: 10px;
   border: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.12));
-  background: var(--bg-surface, rgba(24, 24, 27, 0.85));
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  background: var(--bg-surface, rgba(24, 24, 27, 0.95));
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
   overflow: hidden;
   font-family: inherit;
   color: var(--text-normal, #e4e4e7);
@@ -68,7 +101,7 @@
 }
 
 .pi-openui-content {
-  padding: 12px 14px;
+  padding: 14px 16px;
   max-width: 100%;
   overflow-x: auto;
   overflow-y: auto;
@@ -90,10 +123,9 @@
 }
 
 .pi-openui-errors {
-  margin-top: 8px;
   padding: 8px 12px;
-  background: rgba(239, 68, 68, 0.15);
-  border: 1px solid rgba(239, 68, 68, 0.3);
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.25);
   border-radius: 6px;
   color: #fca5a5;
   font-size: 12px;
@@ -101,6 +133,85 @@
 
 .pi-openui-error-item {
   line-height: 1.4;
+}
+
+/* OpenUI button base: clean dark-theme styling, eliminates ugly unstyled browser borders */
+.openui-button-base,
+button.openui-button-base {
+  box-sizing: border-box !important;
+  font-family: inherit !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  border-radius: 6px !important;
+  cursor: pointer !important;
+  display: inline-flex !important;
+  gap: 6px !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 6px 14px !important;
+  transition: all 0.15s ease !important;
+  user-select: none !important;
+  outline: none !important;
+  line-height: 1.4 !important;
+}
+
+.openui-button-base-primary,
+button.openui-button-base-primary {
+  background-color: #9333ea !important;
+  color: #ffffff !important;
+  border: 1px solid #a855f7 !important;
+  box-shadow: 0 2px 8px rgba(147, 51, 234, 0.3) !important;
+}
+
+.openui-button-base-primary:hover,
+button.openui-button-base-primary:hover {
+  background-color: #a855f7 !important;
+  box-shadow: 0 4px 12px rgba(147, 51, 234, 0.45) !important;
+}
+
+.openui-button-base-secondary,
+button.openui-button-base-secondary,
+.openui-button-base-tertiary,
+button.openui-button-base-tertiary {
+  background-color: rgba(255, 255, 255, 0.08) !important;
+  color: #e4e4e7 !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+}
+
+.openui-button-base-secondary:hover,
+button.openui-button-base-secondary:hover,
+.openui-button-base-tertiary:hover,
+button.openui-button-base-tertiary:hover {
+  background-color: rgba(255, 255, 255, 0.14) !important;
+  color: #ffffff !important;
+}
+
+/* Form input fields: beautiful dark inputs with subtle border */
+.openui-input-base,
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="search"],
+textarea,
+select {
+  box-sizing: border-box;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 6px;
+  color: #f4f4f5;
+  padding: 6px 10px;
+  font-size: 13px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+
+.openui-input-base:focus,
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: #a855f7;
+  box-shadow: 0 0 0 2px rgba(168, 85, 247, 0.2);
 }
 
 /* Composer toolbar control: borderless and aligned with host toolbar chips */
@@ -128,7 +239,6 @@
   color: var(--text-normal, #f4f4f5);
 }
 
-/* Active state: subtle background highlight, no border */
 .pi-openui-composer-btn.is-active {
   background: rgba(255, 255, 255, 0.1);
   color: var(--text-normal, #ffffff);
@@ -138,7 +248,6 @@
   background: rgba(255, 255, 255, 0.15);
 }
 
-/* Inactive state */
 .pi-openui-composer-btn.is-inactive {
   opacity: 0.6;
 }
@@ -148,7 +257,6 @@
   background: rgba(255, 255, 255, 0.06);
 }
 
-/* Status dot indicating state */
 .pi-openui-state-dot {
   width: 6px;
   height: 6px;
