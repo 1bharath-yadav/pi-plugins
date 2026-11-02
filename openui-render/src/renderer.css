@@ -1,0 +1,157 @@
+/* Container for OpenUI interactive blocks inside conversation */
+.pi-openui-card {
+  margin: 10px 0;
+  border-radius: 10px;
+  border: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.12));
+  background: var(--bg-surface, rgba(24, 24, 27, 0.85));
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+  font-family: inherit;
+  color: var(--text-normal, #e4e4e7);
+  transition: border-color 0.15s ease;
+}
+
+.pi-openui-card:hover {
+  border-color: var(--border-active, rgba(168, 85, 247, 0.35));
+}
+
+.pi-openui-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 12px;
+  border-bottom: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.08));
+  background: var(--bg-header, rgba(255, 255, 255, 0.03));
+}
+
+.pi-openui-tag {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-normal, #f4f4f5);
+  letter-spacing: 0.01em;
+}
+
+.pi-openui-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-normal, #f4f4f5);
+}
+
+.pi-openui-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pi-openui-btn {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--text-muted, #a1a1aa);
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.pi-openui-btn:hover {
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
+}
+
+.pi-openui-content {
+  padding: 12px 14px;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.pi-openui-source {
+  margin: 0;
+  padding: 12px 14px;
+  background: rgba(0, 0, 0, 0.35);
+  font-family: var(--font-mono, monospace);
+  font-size: 12px;
+  line-height: 1.5;
+  color: #e4e4e7;
+  overflow-x: auto;
+  white-space: pre-wrap;
+}
+
+.pi-openui-errors {
+  margin-top: 8px;
+  padding: 8px 12px;
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 6px;
+  color: #fca5a5;
+  font-size: 12px;
+}
+
+.pi-openui-error-item {
+  line-height: 1.4;
+}
+
+/* Composer toolbar control: borderless and aligned with host toolbar chips */
+.pi-openui-composer-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 28px;
+  padding: 0 8px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-muted, #9ca3af);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  user-select: none;
+  outline: none;
+  line-height: 1;
+}
+
+.pi-openui-composer-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-normal, #f4f4f5);
+}
+
+/* Active state: subtle background highlight, no border */
+.pi-openui-composer-btn.is-active {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-normal, #ffffff);
+}
+
+.pi-openui-composer-btn.is-active:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* Inactive state */
+.pi-openui-composer-btn.is-inactive {
+  opacity: 0.6;
+}
+
+.pi-openui-composer-btn.is-inactive:hover {
+  opacity: 0.9;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+/* Status dot indicating state */
+.pi-openui-state-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #22c55e;
+  display: inline-block;
+  margin-left: 1px;
+  box-shadow: 0 0 6px rgba(34, 197, 94, 0.4);
+}
+
+.pi-openui-state-dot.is-off {
+  background: #71717a;
+  box-shadow: none;
+}

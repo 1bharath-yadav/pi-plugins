@@ -1,0 +1,168 @@
+/* Use the host-mounted element as the only scroll container. The host clips panel children,
+   so nesting a second flex scroller can collapse and make the lesson impossible to scroll. */
+.olr-panel-root {
+  display: block;
+  flex: 1 1 auto;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  box-sizing: border-box;
+  padding: 16px 20px 28px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  touch-action: pan-y;
+  -webkit-overflow-scrolling: touch;
+}
+.olr-panel-root:focus { outline: none; }
+.olr-panel-root > * { min-width: 0; }
+/* Scoped visual system for generated lesson components. */
+.olr-lesson {
+  --ol-ink: var(--text-base, currentColor);
+  --ol-muted: color-mix(in srgb, currentColor 68%, transparent);
+  --ol-faint: color-mix(in srgb, currentColor 48%, transparent);
+  --ol-surface: color-mix(in srgb, currentColor 4%, transparent);
+  --ol-surface-strong: color-mix(in srgb, currentColor 8%, transparent);
+  --ol-border: color-mix(in srgb, currentColor 16%, transparent);
+  --ol-radius-sm: 5px; --ol-radius-md: 8px; --ol-radius-lg: 12px; --ol-radius-xl: 16px;
+  --ol-font: inherit;
+  --ol-chart-1: #3b82f6; --ol-chart-2: #f97316; --ol-chart-3: #8b5cf6;
+  --ol-chart-4: #10b981; --ol-chart-5: #eab308; --ol-chart-6: #ec4899;
+  --ol-info: #3b82f6; --ol-success: #16a34a; --ol-warning: #d97706; --ol-danger: #dc2626;
+  --ol-purple: #8b5cf6; --ol-pink: #ec4899;
+  --ol-info-soft: color-mix(in srgb, #3b82f6 12%, transparent);
+  --ol-success-soft: color-mix(in srgb, #16a34a 12%, transparent);
+  --ol-warning-soft: color-mix(in srgb, #d97706 12%, transparent);
+  --ol-danger-soft: color-mix(in srgb, #dc2626 12%, transparent);
+  --ol-purple-soft: color-mix(in srgb, #8b5cf6 12%, transparent);
+  --ol-pink-soft: color-mix(in srgb, #ec4899 12%, transparent);
+  min-width: 0; max-width: 100%; color: var(--ol-ink); font: inherit; line-height: 1.55; overflow-wrap: anywhere;
+}
+.olr-lesson *, .olr-lesson *::before, .olr-lesson *::after { box-sizing: border-box; }
+.olr-lesson-head { padding: 2px 0 16px; border-bottom: 1px solid var(--ol-border); margin-bottom: 18px; }
+.olr-lesson-objective { margin: 9px 0 0; color: var(--ol-muted); font-size: 15px; line-height: 1.6; }
+.olr-lesson-body { min-width: 0; }
+.olr-flow { display: flex; flex-direction: column; gap: 18px; }
+.olr-col { display: flex; flex-direction: column; min-width: 0; }
+.olr-row { display: flex; flex-flow: row wrap; align-items: center; gap: 12px; min-width: 0; }
+.olr-row > * { min-width: 0; }
+.olr-grid { display: grid; min-width: 0; align-items: stretch; }
+.olr-spacer { flex: 1 1 auto; min-width: 12px; min-height: 1px; }
+.olr-divider { width: 100%; height: 1px; border: 0; background: var(--ol-border); margin: 2px 0; }
+.olr-title { font-weight: 680; line-height: 1.25; letter-spacing: -.02em; overflow-wrap: anywhere; }
+.olr-title-sm { font-size: 15px; } .olr-title-md { font-size: 18px; } .olr-title-lg { font-size: 21px; }
+.olr-title-xl { font-size: 25px; } .olr-title-2xl { font-size: clamp(24px, 4vw, 31px); } .olr-title-3xl { font-size: clamp(28px, 5vw, 38px); }
+.olr-text { min-width: 0; margin: 0; line-height: 1.65; }
+.olr-text-xs { font-size: 12px; } .olr-text-sm { font-size: 13px; } .olr-text-md { font-size: 14px; } .olr-text-lg { font-size: 17px; }
+.olr-weight-medium { font-weight: 550; } .olr-weight-semibold { font-weight: 650; }
+.olr-caption { color: var(--ol-muted); font-size: 12px; line-height: 1.5; margin: 5px 0 0; }
+.olr-badge { display: inline-flex; align-items: center; width: max-content; max-width: 100%; padding: 4px 9px; border: 1px solid var(--ol-border); border-radius: 999px; font-size: 12px; font-weight: 600; line-height: 1.35; }
+.olr-badge-neutral { background: var(--ol-surface); }
+.olr-badge-info { color: var(--ol-info); background: var(--ol-info-soft); } .olr-badge-success { color: var(--ol-success); background: var(--ol-success-soft); }
+.olr-badge-warning { color: var(--ol-warning); background: var(--ol-warning-soft); } .olr-badge-danger { color: var(--ol-danger); background: var(--ol-danger-soft); }
+.olr-badge-purple { color: var(--ol-purple); background: var(--ol-purple-soft); } .olr-badge-pink { color: var(--ol-pink); background: var(--ol-pink-soft); }
+.olr-card { min-width: 0; padding: 14px; border: 1px solid var(--ol-border); border-radius: var(--ol-radius-lg); background: transparent; }
+.olr-card-soft { background: var(--ol-surface); }
+.olr-list { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 10px; }
+.olr-list > li { display: flex; align-items: flex-start; gap: 10px; min-width: 0; }
+.olr-list-marker { display: inline-flex; flex: 0 0 22px; align-items: center; justify-content: center; color: var(--ol-muted); }
+.olr-list-marker-chip { width: 24px; height: 24px; border-radius: 50%; background: var(--ol-surface-strong); color: var(--ol-ink); font-size: 12px; font-weight: 650; }
+.olr-list-body { min-width: 0; flex: 1; } .olr-list-title { font-weight: 600; line-height: 1.45; }
+.olr-list-description { color: var(--ol-muted); margin-top: 3px; line-height: 1.6; } .olr-list-children { margin-top: 8px; }
+.olr-timeline > li { position: relative; } .olr-timeline > li:not(:last-child)::after { content: ""; position: absolute; left: 10px; top: 26px; bottom: -12px; border-left: 1px solid var(--ol-border); }
+.olr-link { color: var(--ol-chart-1); text-decoration: underline; text-underline-offset: 2px; overflow-wrap: anywhere; } .olr-inline { display: inline; }
+.olr-quote { display: flex; flex-direction: column; gap: 4px; margin: 0; padding: 12px 15px; border-left: 3px solid var(--ol-chart-3); border-radius: 0 var(--ol-radius-md) var(--ol-radius-md) 0; background: var(--ol-surface); }
+.olr-quote > p { margin: 0; } .olr-quote cite { color: var(--ol-muted); font-size: 12px; font-style: normal; }
+.olr-markdown { min-width: 0; line-height: 1.65; overflow-wrap: anywhere; } .olr-markdown > :first-child { margin-top: 0; } .olr-markdown > :last-child { margin-bottom: 0; }
+.olr-markdown h1, .olr-markdown h2, .olr-markdown h3, .olr-markdown h4 { line-height: 1.3; letter-spacing: -.02em; margin: 1.2em 0 .45em; font-weight: 650; }
+.olr-markdown h1 { font-size: 25px; } .olr-markdown h2 { font-size: 21px; } .olr-markdown h3 { font-size: 17px; } .olr-markdown h4 { font-size: 15px; }
+.olr-markdown p { margin: .55em 0; } .olr-markdown ul, .olr-markdown ol { padding-left: 1.45em; margin: .5em 0; }
+.olr-markdown blockquote { margin: 10px 0; padding: 5px 12px; border-left: 3px solid var(--ol-border); color: var(--ol-muted); }
+.olr-markdown pre { overflow-x: auto; max-width: 100%; padding: 12px; border-radius: var(--ol-radius-md); border: 1px solid var(--ol-border); background: var(--ol-surface); font-size: 12px; }
+.olr-markdown code, .olr-codeblock code { font-family: var(--font-mono, ui-monospace, SFMono-Regular, Consolas, monospace); font-size: .9em; }
+.olr-markdown :not(pre) > code { padding: 1px 4px; background: var(--ol-surface); border-radius: 4px; }
+.olr-markdown table { display: block; max-width: 100%; overflow-x: auto; border-collapse: collapse; }
+.olr-markdown th, .olr-markdown td { padding: 7px 9px; border: 1px solid var(--ol-border); text-align: left; } .olr-markdown th { background: var(--ol-surface); }
+.olr-math { max-width: 100%; } .olr-math .katex { font-size: 1.08em; }
+.olr-math.is-block { width: 100%; overflow-x: auto; overflow-y: hidden; padding: 5px 0; }
+.olr-math.is-block .katex-display { width: max-content; min-width: 100%; margin: 0; text-align: center; }
+.olr-codeblock { min-width: 0; overflow: hidden; border: 1px solid var(--ol-border); border-radius: var(--ol-radius-lg); background: var(--ol-surface); }
+.olr-codeblock-head { display: flex; align-items: center; justify-content: space-between; padding: 6px 10px; border-bottom: 1px solid var(--ol-border); color: var(--ol-muted); font-size: 12px; }
+.olr-codeblock-head button { border: 0; border-radius: 5px; padding: 4px 8px; background: transparent; color: inherit; cursor: pointer; } .olr-codeblock-head button:hover { background: var(--ol-surface-strong); }
+.olr-codeblock pre { margin: 0; padding: 12px; overflow-x: auto; font-size: 12px; } .olr-codeblock code { white-space: pre; }
+.olr-button { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 34px; max-width: 100%; padding: 7px 12px; border: 1px solid var(--ol-border); border-radius: 9px; font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; }
+.olr-button:disabled { opacity: .5; cursor: not-allowed; } .olr-button-solid { color: white; border-color: var(--ol-chart-1); background: var(--ol-chart-1); }
+.olr-button-outline { background: transparent; } .olr-button-soft { background: var(--ol-surface-strong); } .olr-button-ghost { background: transparent; border-color: transparent; }
+.olr-button-sm { min-height: 28px; padding: 4px 9px; font-size: 12px; } .olr-button-lg { min-height: 40px; padding: 9px 15px; font-size: 14px; }
+.olr-slider { display: flex; flex-direction: column; gap: 7px; min-width: 100px; }
+.olr-slider-head { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; color: var(--ol-muted); font-size: 12px; }
+.olr-slider-head output { color: var(--ol-ink); font-variant-numeric: tabular-nums; } .olr-range { width: 100%; min-width: 80px; accent-color: var(--ol-chart-1); cursor: ew-resize; }
+.olr-segmented { display: flex; flex-wrap: wrap; gap: 3px; max-width: 100%; padding: 3px; border: 1px solid var(--ol-border); border-radius: 10px; background: var(--ol-surface); }
+.olr-segmented button { min-width: 0; border: 0; border-radius: 7px; padding: 6px 9px; background: transparent; color: inherit; font: inherit; font-size: 12px; cursor: pointer; }
+.olr-segmented button.is-selected { background: var(--ol-surface-strong); box-shadow: 0 0 0 1px var(--ol-border); }
+.olr-check { display: inline-flex; align-items: center; gap: 8px; max-width: 100%; cursor: pointer; } .olr-check input { accent-color: var(--ol-chart-1); }
+.olr-quiz { padding: 14px; } .olr-quiz-options { display: flex; flex-direction: column; gap: 7px; margin-top: 10px; }
+.olr-quiz-option { padding: 9px 11px; text-align: left; border: 1px solid var(--ol-border); border-radius: 8px; background: transparent; color: inherit; font: inherit; cursor: pointer; }
+.olr-quiz-option:hover:not(:disabled) { background: var(--ol-surface); } .olr-quiz-option:disabled { cursor: default; }
+.olr-quiz-option.is-correct, .olr-quiz-option.is-answer { border-color: var(--ol-success); background: var(--ol-success-soft); }
+.olr-quiz-option.is-wrong { border-color: var(--ol-danger); background: var(--ol-danger-soft); }
+.olr-quiz-result { padding: 10px; margin-top: 10px; border-radius: var(--ol-radius-md); background: var(--ol-surface); font-size: 13px; }
+.olr-chart { width: 100%; min-width: 0; margin: 0; padding: 10px 0; } .olr-chart svg { display: block; width: 100%; height: auto; max-height: 480px; overflow: visible; }
+.olr-chart-grid { stroke: var(--ol-border); stroke-width: 1; } .olr-chart-axis { stroke: var(--ol-faint); stroke-width: 1.2; }
+.olr-chart-tick { fill: var(--ol-muted); font-size: 11px; } .olr-chart-label { fill: var(--ol-muted); font-size: 12px; }
+.olr-chart-legend { display: flex; flex-wrap: wrap; gap: 8px 14px; justify-content: center; color: var(--ol-muted); font-size: 12px; }
+.olr-chart-legend span { display: inline-flex; align-items: center; gap: 6px; } .olr-chart-legend i { display: inline-block; width: 9px; height: 9px; border-radius: 50%; }
+.olr-chart-empty { padding: 22px 12px; border: 1px dashed var(--ol-border); border-radius: var(--ol-radius-md); color: var(--ol-muted); text-align: center; font-size: 13px; }
+.olr-scene3d { width: 100%; min-width: 0; overflow: hidden; border: 1px solid var(--ol-border); border-radius: var(--ol-radius-lg); background: var(--ol-surface); touch-action: none; cursor: grab; }
+.olr-scene3d:active { cursor: grabbing; } .olr-scene3d:focus-visible { outline: 2px solid var(--ol-chart-1); outline-offset: 2px; }
+.olr-scene3d svg { display: block; width: 100%; height: auto; max-height: 520px; }
+@media (max-width: 520px) {
+  .olr-title-2xl { font-size: 24px; }
+  .olr-grid { grid-template-columns: minmax(0, 1fr) !important; }
+  .olr-row { align-items: stretch; }
+  .olr-row > .olr-card { flex: 1 1 100%; }
+  .olr-lesson-head { padding-bottom: 12px; }
+}
+
+/* Keep every lesson from this session in a readable chronological stack. */
+.olr-lesson-history {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  width: 100%;
+  min-width: 0;
+  padding-bottom: 22px;
+}
+.olr-lesson-history-entry {
+  width: 100%;
+  min-width: 0;
+}
+.olr-lesson-history-divider {
+  width: 100%;
+  border-top: 1px solid var(--ol-border, color-mix(in srgb, currentColor 16%, transparent));
+  margin: 1px 0;
+}
+
+/* User prompts are displayed as compact, right-aligned bubbles above their rendered lesson. */
+.olr-user-prompt-row {
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+  min-width: 0;
+  margin: 0 0 20px;
+}
+.olr-user-prompt-bubble {
+  max-width: min(88%, 760px);
+  min-width: 0;
+  padding: 10px 14px;
+  border: 1px solid var(--ol-border, color-mix(in srgb, currentColor 14%, transparent));
+  border-radius: 16px 16px 4px 16px;
+  background: var(--ol-surface-strong, color-mix(in srgb, currentColor 8%, transparent));
+  color: inherit;
+  font: inherit;
+  font-size: 14px;
+  line-height: 1.55;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}

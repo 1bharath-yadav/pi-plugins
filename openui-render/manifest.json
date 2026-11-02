@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "id": "local.openui-render",
+  "name": "OpenUI Render",
+  "version": "0.2.0",
+  "description": "Interactive OpenUI Lang renderer and generative UI for PI-Desktop conversations.",
+  "author": "Bharath",
+  "main": "main.cjs",
+  "renderer": "dist/renderer.mjs",
+  "rendererActions": [
+    "plugin.call",
+    "composer.insertText"
+  ],
+  "rendererCallMethods": [
+    "openui.getMode",
+    "openui.setMode",
+    "study.getMode",
+    "study.setMode"
+  ],
+  "permissions": [
+    "renderer.extension",
+    "agent.extension"
+  ],
+  "contributes": {
+    "agentExtensions": [
+      "agent/extension.ts"
+    ],
+    "commands": [
+      {
+        "id": "openui.insertTemplate",
+        "title": "Insert OpenUI Template",
+        "keywords": ["openui", "render", "ui", "template", "lesson"]
+      }
+    ]
+  },
+  "activationEvents": [
+    "onStartup"
+  ],
+  "engines": {
+    "piDesktop": ">=0.1.0"
+  }
+}

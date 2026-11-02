@@ -1,0 +1,2023 @@
+{
+  "root": "Lesson",
+  "components": {
+    "Lesson": {
+      "signature": "Lesson(title: string, objective?: string, children: Node[])",
+      "description": "The root of every response: a title, an optional one-sentence objective, and the lesson body as a free mix of this library's components (Col, Row, Grid, Card, Title, Text, Markdown, List, Math, Chart, Svg, Scene3D, Slider, SegmentedControl, Checkbox, Button, Quiz, ...). Compose the body the way a real page would be laid out, not as one long Markdown block."
+    },
+    "Col": {
+      "signature": "Col(children: Node[], gap?: number, align?: \"start\" | \"center\" | \"end\" | \"stretch\")",
+      "description": "Vertical layout. Without gap it spaces blocks like an article."
+    },
+    "Row": {
+      "signature": "Row(children: Node[], gap?: number, align?: \"start\" | \"center\" | \"end\" | \"stretch\", justify?: \"start\" | \"center\" | \"end\" | \"between\", wrap?: boolean)",
+      "description": "Horizontal layout; items are vertically centered. Use wrap for chips and controls so a narrow panel never overflows."
+    },
+    "Grid": {
+      "signature": "Grid(children: Node[], columns?: number, minChildWidth?: number, gap?: number)",
+      "description": "Equal columns (default 2). With minChildWidth (px) the columns drop on a narrow panel."
+    },
+    "Card": {
+      "signature": "Card(children: Node[], variant?: \"outline\" | \"soft\", padding?: number, gap?: number)",
+      "description": "Panel with a border; soft is a filled panel for summaries and callouts."
+    },
+    "Divider": {
+      "signature": "Divider()",
+      "description": "A thin horizontal rule between sections."
+    },
+    "Spacer": {
+      "signature": "Spacer()",
+      "description": "Fills the free space in a Row."
+    },
+    "Title": {
+      "signature": "Title(text: string, size?: \"sm\" | \"md\" | \"lg\" | \"xl\" | \"2xl\" | \"3xl\", color?: Color)",
+      "description": "Heading. 2xl for the page title, lg for a section, md for a card title."
+    },
+    "Text": {
+      "signature": "Text(text: string | Node[], size?: \"xs\" | \"sm\" | \"md\" | \"lg\", color?: Color, weight?: \"normal\" | \"medium\" | \"semibold\", italic?: boolean, tabularNums?: boolean)",
+      "description": "Paragraph; supports **bold**, *italic*, `code`, [links](https://…) and inline math like $x_1$. text may be a list mixing strings and inline components: [\"Slope \", Math(\"m = \\\\frac{y_2-y_1}{x_2-x_1}\", true)]."
+    },
+    "Caption": {
+      "signature": "Caption(text: string, color?: Color)",
+      "description": "Small secondary text, such as a figure caption or a unit note."
+    },
+    "Badge": {
+      "signature": "Badge(text: string, color?: \"neutral\" | \"info\" | \"success\" | \"warning\" | \"danger\" | \"purple\" | \"pink\")",
+      "description": "Small pill tag for a topic, a level or a class label."
+    },
+    "Link": {
+      "signature": "Link(text: string, url: string)",
+      "description": "Opens an absolute http(s) URL in the browser."
+    },
+    "ListItem": {
+      "signature": "ListItem(title: string, description?: string, marker?: string, children?: Node[])",
+      "description": "One list entry: a title, an optional description (Markdown and $math$ allowed) and optional extra blocks. marker replaces the bullet or number."
+    },
+    "List": {
+      "signature": "List(items: (string | ListItem)[], marker?: \"bullet\" | \"number\" | \"none\", timeline?: boolean)",
+      "description": "Bulleted or numbered list. number puts each step in a numbered circle; timeline joins the markers with a line."
+    },
+    "Markdown": {
+      "signature": "Markdown(text: string)",
+      "description": "Prose with headings, lists, quotes, code, tables and math ($x^2$ inline, $$ on its own lines for display)."
+    },
+    "Quote": {
+      "signature": "Quote(text: string, cite?: string)",
+      "description": "A callout or quotation with a side rule: a key idea, a warning, a definition. cite names the source."
+    },
+    "Code": {
+      "signature": "Code(code: string, language?: string)",
+      "description": "Code block with a copy button. Displays code only; nothing in it is executed."
+    },
+    "Math": {
+      "signature": "Math(tex: string, inline?: boolean)",
+      "description": "LaTeX formula typeset with KaTeX, e.g. Math(\"\\\\int_0^1 x^2\\\\,dx = \\\\frac{1}{3}\"). Display style by default; inline true to sit inside a Text list. No dollar signs."
+    },
+    "Button": {
+      "signature": "Button(label: string, action?: ActionExpression, variant?: \"solid\" | \"outline\" | \"soft\" | \"ghost\", size?: \"sm\" | \"md\" | \"lg\", disabled?: boolean)",
+      "description": "Runs its action when pressed, such as @Set($epochs, $epochs + 100). Every Button needs an action."
+    },
+    "Slider": {
+      "signature": "Slider(value: $binding<number>, min: number, max: number, step?: number, label?: string, unit?: string)",
+      "description": "Slider bound to a $variable, e.g. Slider($c, 0.1, 100, 0.1, \"C\"). Shows label and value; everything computed from the variable updates live."
+    },
+    "SegmentedControl": {
+      "signature": "SegmentedControl(value: $binding<string>, options: (string | {value: string, label: string})[])",
+      "description": "2 to 4 short mutually exclusive choices in a row, bound to a $variable."
+    },
+    "Checkbox": {
+      "signature": "Checkbox(checked: $binding<boolean>, label: string)",
+      "description": "A labelled checkbox bound to a $variable, e.g. to show or hide a margin, a layer or a hint."
+    },
+    "Quiz": {
+      "signature": "Quiz(question: string, options: string[], answerIndex: number, explanation: string)",
+      "description": "One multiple-choice check of understanding with instant feedback. answerIndex is the zero-based index of the correct option."
+    },
+    "Svg": {
+      "signature": "Svg(children: Node[], viewBox: string, width?: Length, height?: Length)",
+      "description": "A drawing for diagrams, geometry, free-body figures, graphs and mechanisms. Scales to its width; shape arguments accept expressions, so $variables can move them."
+    },
+    "Circle": {
+      "signature": "Circle(cx: number, cy: number, r: number, fill?: Color, stroke?: Color, strokeWidth?: number, opacity?: number)",
+      "description": ""
+    },
+    "Ellipse": {
+      "signature": "Ellipse(cx: number, cy: number, rx: number, ry: number, fill?: Color, stroke?: Color, strokeWidth?: number, opacity?: number)",
+      "description": ""
+    },
+    "Rect": {
+      "signature": "Rect(x: number, y: number, width: number, height: number, fill?: Color, stroke?: Color, strokeWidth?: number, opacity?: number, rx?: number)",
+      "description": ""
+    },
+    "Line": {
+      "signature": "Line(x1: number, y1: number, x2: number, y2: number, stroke?: Color, strokeWidth?: number, opacity?: number, dashed?: boolean)",
+      "description": "dashed draws a dashed line."
+    },
+    "Path": {
+      "signature": "Path(d: string, fill?: Color, stroke?: Color, strokeWidth?: number, opacity?: number)",
+      "description": "d uses M L H V C S Q T A Z commands with numbers only."
+    },
+    "Polyline": {
+      "signature": "Polyline(points: string, stroke?: Color, strokeWidth?: number, fill?: Color, opacity?: number)",
+      "description": "points like \"0,0 10,5 20,0\". Build a curve from data with @Join(@Each(xs, \"x\", x + \",\" + f), \" \")."
+    },
+    "Polygon": {
+      "signature": "Polygon(points: string, fill?: Color, stroke?: Color, strokeWidth?: number, opacity?: number)",
+      "description": ""
+    },
+    "G": {
+      "signature": "G(children: Node[], transform?: string, opacity?: number)",
+      "description": "Group; transform like \"rotate(30 50 50)\" or \"translate(10 0)\"."
+    },
+    "SvgText": {
+      "signature": "SvgText(text: string, x: number, y: number, size?: number, fill?: Color, anchor?: \"start\" | \"middle\" | \"end\", weight?: \"normal\" | \"medium\" | \"semibold\")",
+      "description": "A label inside an Svg. Plain text only."
+    },
+    "Chart": {
+      "signature": "Chart(kind: \"line\" | \"area\" | \"bar\" | \"scatter\", data: any[], x: string, y: string[], xLabel?: string, yLabel?: string, height?: number)",
+      "description": "Chart of rows: data is a list of objects, x the key of the horizontal value, y the keys of one or more series. line, area and scatter need numeric x; bar treats x as category labels. Example: Chart(\"line\", @Each(@Linspace(0, 6.3, 80), \"t\", {t: t, v: @Sin(t)}), \"t\", [\"v\"], \"t (rad)\", \"sin t\")."
+    },
+    "Scene3D": {
+      "signature": "Scene3D(points: {x: number, y: number, z: number, label?: number | string}[], plane?: {w: any, b: number}, azimuth?: number, elevation?: number, extent?: number, height?: number, axisLabels?: any)",
+      "description": "Rotatable 3D scatter plot for spatial data. points is a list of {x, y, z, label?}; optional labels distinguish groups. azimuth and elevation (degrees) may be bound to sliders. extent sets the half-width of the axes; omit it to fit the data."
+    }
+  },
+  "functions": {
+    "Sin": {
+      "signature": "Sin(number: number) → number",
+      "description": "Sine of an angle in radians"
+    },
+    "Cos": {
+      "signature": "Cos(number: number) → number",
+      "description": "Cosine of an angle in radians"
+    },
+    "Tan": {
+      "signature": "Tan(number: number) → number",
+      "description": "Tangent of an angle in radians"
+    },
+    "Atan2": {
+      "signature": "Atan2(y: number, x: number) → number",
+      "description": "Angle in radians of the point (x, y) from the x axis"
+    },
+    "Exp": {
+      "signature": "Exp(number: number) → number",
+      "description": "e raised to number"
+    },
+    "Ln": {
+      "signature": "Ln(number: number) → number",
+      "description": "Natural logarithm; null for zero or a negative number"
+    },
+    "Absolute": {
+      "signature": "Absolute(number: number) → number",
+      "description": "Absolute value"
+    },
+    "Sqrt": {
+      "signature": "Sqrt(number: number) → number",
+      "description": "Square root; null for a negative number"
+    },
+    "Pow": {
+      "signature": "Pow(base: number, exponent: number) → number",
+      "description": "base raised to exponent"
+    },
+    "FloorValue": {
+      "signature": "FloorValue(number: number) → number",
+      "description": "Largest whole number not above number"
+    },
+    "Ceiling": {
+      "signature": "Ceiling(number: number) → number",
+      "description": "Smallest whole number not below number"
+    },
+    "Clamp": {
+      "signature": "Clamp(number: number, min: number, max: number) → number",
+      "description": "number kept between min and max"
+    },
+    "Lerp": {
+      "signature": "Lerp(a: number, b: number, t: number) → number",
+      "description": "The value a fraction t of the way from a to b"
+    },
+    "Dot": {
+      "signature": "Dot(a: number[], b: number[]) → number",
+      "description": "Dot product of two number lists of equal length"
+    },
+    "Norm": {
+      "signature": "Norm(list: number[]) → number",
+      "description": "Euclidean length of a number list"
+    },
+    "Range": {
+      "signature": "Range(start: number, end: number, step?: number) → number[]",
+      "description": "Numbers from start up to end (not included) by step (default 1), e.g. @Range(0, 3) is [0, 1, 2]"
+    },
+    "Linspace": {
+      "signature": "Linspace(start: number, end: number, count: number) → number[]",
+      "description": "count evenly spaced numbers from start to end, both included, e.g. @Linspace(0, 1, 5) is [0, 0.25, 0.5, 0.75, 1]"
+    },
+    "Append": {
+      "signature": "Append(list: any[], item: any) → any[]",
+      "description": "Copy of the list with item added at the end"
+    },
+    "Toggle": {
+      "signature": "Toggle(list: any[], item: any) → any[]",
+      "description": "Adds item if missing, removes it if present (a set of strings or numbers)"
+    },
+    "Includes": {
+      "signature": "Includes(list: any[] | string, item: any) → boolean",
+      "description": "True if the list has item, or the text contains it"
+    },
+    "Take": {
+      "signature": "Take(list: any[], n: number) → any[]",
+      "description": "The first n items; a negative n takes the last n"
+    },
+    "Reverse": {
+      "signature": "Reverse(list: any[]) → any[]",
+      "description": "Copy in reverse order"
+    },
+    "Fixed": {
+      "signature": "Fixed(number: number, decimals: number) → string",
+      "description": "number as text with exactly decimals digits (0 to 8), e.g. @Fixed(3.14159, 2) is \"3.14\""
+    },
+    "Join": {
+      "signature": "Join(list: any[], separator?: string) → string",
+      "description": "List items as one text, separated by separator (default \", \")"
+    }
+  },
+  "schema": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "type": "object",
+    "properties": {
+      "Lesson": {
+        "$ref": "#/$defs/Lesson"
+      },
+      "Col": {
+        "$ref": "#/$defs/Col"
+      },
+      "Row": {
+        "$ref": "#/$defs/Row"
+      },
+      "Grid": {
+        "$ref": "#/$defs/Grid"
+      },
+      "Card": {
+        "$ref": "#/$defs/Card"
+      },
+      "Divider": {
+        "$ref": "#/$defs/Divider"
+      },
+      "Spacer": {
+        "$ref": "#/$defs/Spacer"
+      },
+      "Title": {
+        "$ref": "#/$defs/Title"
+      },
+      "Text": {
+        "$ref": "#/$defs/Text"
+      },
+      "Caption": {
+        "$ref": "#/$defs/Caption"
+      },
+      "Badge": {
+        "$ref": "#/$defs/Badge"
+      },
+      "Link": {
+        "$ref": "#/$defs/Link"
+      },
+      "ListItem": {
+        "$ref": "#/$defs/ListItem"
+      },
+      "List": {
+        "$ref": "#/$defs/List"
+      },
+      "Markdown": {
+        "$ref": "#/$defs/Markdown"
+      },
+      "Quote": {
+        "$ref": "#/$defs/Quote"
+      },
+      "Code": {
+        "$ref": "#/$defs/Code"
+      },
+      "Math": {
+        "$ref": "#/$defs/Math"
+      },
+      "Button": {
+        "$ref": "#/$defs/Button"
+      },
+      "Slider": {
+        "$ref": "#/$defs/Slider"
+      },
+      "SegmentedControl": {
+        "$ref": "#/$defs/SegmentedControl"
+      },
+      "Checkbox": {
+        "$ref": "#/$defs/Checkbox"
+      },
+      "Quiz": {
+        "$ref": "#/$defs/Quiz"
+      },
+      "Svg": {
+        "$ref": "#/$defs/Svg"
+      },
+      "Circle": {
+        "$ref": "#/$defs/Circle"
+      },
+      "Ellipse": {
+        "$ref": "#/$defs/Ellipse"
+      },
+      "Rect": {
+        "$ref": "#/$defs/Rect"
+      },
+      "Line": {
+        "$ref": "#/$defs/Line"
+      },
+      "Path": {
+        "$ref": "#/$defs/Path"
+      },
+      "Polyline": {
+        "$ref": "#/$defs/Polyline"
+      },
+      "Polygon": {
+        "$ref": "#/$defs/Polygon"
+      },
+      "G": {
+        "$ref": "#/$defs/G"
+      },
+      "SvgText": {
+        "$ref": "#/$defs/SvgText"
+      },
+      "Chart": {
+        "$ref": "#/$defs/Chart"
+      },
+      "Scene3D": {
+        "$ref": "#/$defs/Scene3D"
+      }
+    },
+    "required": [
+      "Lesson",
+      "Col",
+      "Row",
+      "Grid",
+      "Card",
+      "Divider",
+      "Spacer",
+      "Title",
+      "Text",
+      "Caption",
+      "Badge",
+      "Link",
+      "ListItem",
+      "List",
+      "Markdown",
+      "Quote",
+      "Code",
+      "Math",
+      "Button",
+      "Slider",
+      "SegmentedControl",
+      "Checkbox",
+      "Quiz",
+      "Svg",
+      "Circle",
+      "Ellipse",
+      "Rect",
+      "Line",
+      "Path",
+      "Polyline",
+      "Polygon",
+      "G",
+      "SvgText",
+      "Chart",
+      "Scene3D"
+    ],
+    "additionalProperties": false,
+    "$defs": {
+      "Lesson": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "objective": {
+            "type": "string"
+          },
+          "children": {
+            "type": "array",
+            "items": {}
+          }
+        },
+        "required": [
+          "title",
+          "children"
+        ],
+        "additionalProperties": false,
+        "id": "Lesson",
+        "description": "The root of every response: a title, an optional one-sentence objective, and the lesson body as a free mix of this library's components (Col, Row, Grid, Card, Title, Text, Markdown, List, Math, Chart, Svg, Scene3D, Slider, SegmentedControl, Checkbox, Button, Quiz, ...). Compose the body the way a real page would be laid out, not as one long Markdown block."
+      },
+      "Col": {
+        "type": "object",
+        "properties": {
+          "children": {
+            "type": "array",
+            "items": {}
+          },
+          "gap": {
+            "type": "number"
+          },
+          "align": {
+            "type": "string",
+            "enum": [
+              "start",
+              "center",
+              "end",
+              "stretch"
+            ]
+          }
+        },
+        "required": [
+          "children"
+        ],
+        "additionalProperties": false,
+        "id": "Col",
+        "description": "Vertical layout. Without gap it spaces blocks like an article."
+      },
+      "Row": {
+        "type": "object",
+        "properties": {
+          "children": {
+            "type": "array",
+            "items": {}
+          },
+          "gap": {
+            "type": "number"
+          },
+          "align": {
+            "type": "string",
+            "enum": [
+              "start",
+              "center",
+              "end",
+              "stretch"
+            ]
+          },
+          "justify": {
+            "type": "string",
+            "enum": [
+              "start",
+              "center",
+              "end",
+              "between"
+            ]
+          },
+          "wrap": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "children"
+        ],
+        "additionalProperties": false,
+        "id": "Row",
+        "description": "Horizontal layout; items are vertically centered. Use wrap for chips and controls so a narrow panel never overflows."
+      },
+      "Grid": {
+        "type": "object",
+        "properties": {
+          "children": {
+            "type": "array",
+            "items": {}
+          },
+          "columns": {
+            "type": "number"
+          },
+          "minChildWidth": {
+            "type": "number"
+          },
+          "gap": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "children"
+        ],
+        "additionalProperties": false,
+        "id": "Grid",
+        "description": "Equal columns (default 2). With minChildWidth (px) the columns drop on a narrow panel."
+      },
+      "Card": {
+        "type": "object",
+        "properties": {
+          "children": {
+            "type": "array",
+            "items": {}
+          },
+          "variant": {
+            "type": "string",
+            "enum": [
+              "outline",
+              "soft"
+            ]
+          },
+          "padding": {
+            "type": "number"
+          },
+          "gap": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "children"
+        ],
+        "additionalProperties": false,
+        "id": "Card",
+        "description": "Panel with a border; soft is a filled panel for summaries and callouts."
+      },
+      "Divider": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false,
+        "id": "Divider",
+        "description": "A thin horizontal rule between sections."
+      },
+      "Spacer": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false,
+        "id": "Spacer",
+        "description": "Fills the free space in a Row."
+      },
+      "Title": {
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": "string"
+          },
+          "size": {
+            "type": "string",
+            "enum": [
+              "sm",
+              "md",
+              "lg",
+              "xl",
+              "2xl",
+              "3xl"
+            ]
+          },
+          "color": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "text"
+        ],
+        "additionalProperties": false,
+        "id": "Title",
+        "description": "Heading. 2xl for the page title, lg for a section, md for a card title."
+      },
+      "Text": {
+        "type": "object",
+        "properties": {
+          "text": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "array",
+                "items": {}
+              }
+            ]
+          },
+          "size": {
+            "type": "string",
+            "enum": [
+              "xs",
+              "sm",
+              "md",
+              "lg"
+            ]
+          },
+          "color": {
+            "type": "string"
+          },
+          "weight": {
+            "type": "string",
+            "enum": [
+              "normal",
+              "medium",
+              "semibold"
+            ]
+          },
+          "italic": {
+            "type": "boolean"
+          },
+          "tabularNums": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "text"
+        ],
+        "additionalProperties": false,
+        "id": "Text",
+        "description": "Paragraph; supports **bold**, *italic*, `code`, [links](https://…) and inline math like $x_1$. text may be a list mixing strings and inline components: [\"Slope \", Math(\"m = \\\\frac{y_2-y_1}{x_2-x_1}\", true)]."
+      },
+      "Caption": {
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": "string"
+          },
+          "color": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "text"
+        ],
+        "additionalProperties": false,
+        "id": "Caption",
+        "description": "Small secondary text, such as a figure caption or a unit note."
+      },
+      "Badge": {
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": "string"
+          },
+          "color": {
+            "type": "string",
+            "enum": [
+              "neutral",
+              "info",
+              "success",
+              "warning",
+              "danger",
+              "purple",
+              "pink"
+            ]
+          }
+        },
+        "required": [
+          "text"
+        ],
+        "additionalProperties": false,
+        "id": "Badge",
+        "description": "Small pill tag for a topic, a level or a class label."
+      },
+      "Link": {
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "text",
+          "url"
+        ],
+        "additionalProperties": false,
+        "id": "Link",
+        "description": "Opens an absolute http(s) URL in the browser."
+      },
+      "ListItem": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "marker": {
+            "type": "string"
+          },
+          "children": {
+            "type": "array",
+            "items": {}
+          }
+        },
+        "required": [
+          "title"
+        ],
+        "additionalProperties": false,
+        "id": "ListItem",
+        "description": "One list entry: a title, an optional description (Markdown and $math$ allowed) and optional extra blocks. marker replaces the bullet or number."
+      },
+      "List": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "$ref": "#/$defs/ListItem"
+                }
+              ]
+            }
+          },
+          "marker": {
+            "type": "string",
+            "enum": [
+              "bullet",
+              "number",
+              "none"
+            ]
+          },
+          "timeline": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "items"
+        ],
+        "additionalProperties": false,
+        "id": "List",
+        "description": "Bulleted or numbered list. number puts each step in a numbered circle; timeline joins the markers with a line."
+      },
+      "Markdown": {
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "text"
+        ],
+        "additionalProperties": false,
+        "id": "Markdown",
+        "description": "Prose with headings, lists, quotes, code, tables and math ($x^2$ inline, $$ on its own lines for display)."
+      },
+      "Quote": {
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": "string"
+          },
+          "cite": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "text"
+        ],
+        "additionalProperties": false,
+        "id": "Quote",
+        "description": "A callout or quotation with a side rule: a key idea, a warning, a definition. cite names the source."
+      },
+      "Code": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "language": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "code"
+        ],
+        "additionalProperties": false,
+        "id": "Code",
+        "description": "Code block with a copy button. Displays code only; nothing in it is executed."
+      },
+      "Math": {
+        "type": "object",
+        "properties": {
+          "tex": {
+            "type": "string"
+          },
+          "inline": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "tex"
+        ],
+        "additionalProperties": false,
+        "id": "Math",
+        "description": "LaTeX formula typeset with KaTeX, e.g. Math(\"\\\\int_0^1 x^2\\\\,dx = \\\\frac{1}{3}\"). Display style by default; inline true to sit inside a Text list. No dollar signs."
+      },
+      "Button": {
+        "type": "object",
+        "properties": {
+          "label": {
+            "type": "string"
+          },
+          "action": {
+            "$ref": "#/$defs/ActionExpression"
+          },
+          "variant": {
+            "type": "string",
+            "enum": [
+              "solid",
+              "outline",
+              "soft",
+              "ghost"
+            ]
+          },
+          "size": {
+            "type": "string",
+            "enum": [
+              "sm",
+              "md",
+              "lg"
+            ]
+          },
+          "disabled": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "label"
+        ],
+        "additionalProperties": false,
+        "id": "Button",
+        "description": "Runs its action when pressed, such as @Set($epochs, $epochs + 100). Every Button needs an action."
+      },
+      "ActionExpression": {
+        "anyOf": [
+          {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "const": "open_url"
+              },
+              "url": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "type",
+              "url"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "const": "continue_conversation"
+              },
+              "context": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "type"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string"
+              },
+              "params": {
+                "type": "object",
+                "propertyNames": {
+                  "type": "string"
+                },
+                "additionalProperties": {}
+              }
+            },
+            "required": [
+              "type"
+            ],
+            "additionalProperties": false
+          }
+        ],
+        "id": "ActionExpression"
+      },
+      "Slider": {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "number"
+          },
+          "min": {
+            "type": "number"
+          },
+          "max": {
+            "type": "number"
+          },
+          "step": {
+            "type": "number"
+          },
+          "label": {
+            "type": "string"
+          },
+          "unit": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value",
+          "min",
+          "max"
+        ],
+        "additionalProperties": false,
+        "id": "Slider",
+        "description": "Slider bound to a $variable, e.g. Slider($c, 0.1, 100, 0.1, \"C\"). Shows label and value; everything computed from the variable updates live."
+      },
+      "SegmentedControl": {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          },
+          "options": {
+            "type": "array",
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "value": {
+                      "type": "string"
+                    },
+                    "label": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "value",
+                    "label"
+                  ],
+                  "additionalProperties": false
+                }
+              ]
+            }
+          }
+        },
+        "required": [
+          "value",
+          "options"
+        ],
+        "additionalProperties": false,
+        "id": "SegmentedControl",
+        "description": "2 to 4 short mutually exclusive choices in a row, bound to a $variable."
+      },
+      "Checkbox": {
+        "type": "object",
+        "properties": {
+          "checked": {
+            "type": "boolean"
+          },
+          "label": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "checked",
+          "label"
+        ],
+        "additionalProperties": false,
+        "id": "Checkbox",
+        "description": "A labelled checkbox bound to a $variable, e.g. to show or hide a margin, a layer or a hint."
+      },
+      "Quiz": {
+        "type": "object",
+        "properties": {
+          "question": {
+            "type": "string"
+          },
+          "options": {
+            "minItems": 2,
+            "maxItems": 5,
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "answerIndex": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "explanation": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "question",
+          "options",
+          "answerIndex",
+          "explanation"
+        ],
+        "additionalProperties": false,
+        "id": "Quiz",
+        "description": "One multiple-choice check of understanding with instant feedback. answerIndex is the zero-based index of the correct option."
+      },
+      "Svg": {
+        "type": "object",
+        "properties": {
+          "children": {
+            "type": "array",
+            "items": {}
+          },
+          "viewBox": {
+            "type": "string"
+          },
+          "width": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "string"
+              }
+            ]
+          },
+          "height": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "string"
+              }
+            ]
+          }
+        },
+        "required": [
+          "children",
+          "viewBox"
+        ],
+        "additionalProperties": false,
+        "id": "Svg",
+        "description": "A drawing for diagrams, geometry, free-body figures, graphs and mechanisms. Scales to its width; shape arguments accept expressions, so $variables can move them."
+      },
+      "Circle": {
+        "type": "object",
+        "properties": {
+          "cx": {
+            "type": "number"
+          },
+          "cy": {
+            "type": "number"
+          },
+          "r": {
+            "type": "number"
+          },
+          "fill": {
+            "type": "string"
+          },
+          "stroke": {
+            "type": "string"
+          },
+          "strokeWidth": {
+            "type": "number"
+          },
+          "opacity": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "cx",
+          "cy",
+          "r"
+        ],
+        "additionalProperties": false,
+        "id": "Circle"
+      },
+      "Ellipse": {
+        "type": "object",
+        "properties": {
+          "cx": {
+            "type": "number"
+          },
+          "cy": {
+            "type": "number"
+          },
+          "rx": {
+            "type": "number"
+          },
+          "ry": {
+            "type": "number"
+          },
+          "fill": {
+            "type": "string"
+          },
+          "stroke": {
+            "type": "string"
+          },
+          "strokeWidth": {
+            "type": "number"
+          },
+          "opacity": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "cx",
+          "cy",
+          "rx",
+          "ry"
+        ],
+        "additionalProperties": false,
+        "id": "Ellipse"
+      },
+      "Rect": {
+        "type": "object",
+        "properties": {
+          "x": {
+            "type": "number"
+          },
+          "y": {
+            "type": "number"
+          },
+          "width": {
+            "type": "number"
+          },
+          "height": {
+            "type": "number"
+          },
+          "fill": {
+            "type": "string"
+          },
+          "stroke": {
+            "type": "string"
+          },
+          "strokeWidth": {
+            "type": "number"
+          },
+          "opacity": {
+            "type": "number"
+          },
+          "rx": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "x",
+          "y",
+          "width",
+          "height"
+        ],
+        "additionalProperties": false,
+        "id": "Rect"
+      },
+      "Line": {
+        "type": "object",
+        "properties": {
+          "x1": {
+            "type": "number"
+          },
+          "y1": {
+            "type": "number"
+          },
+          "x2": {
+            "type": "number"
+          },
+          "y2": {
+            "type": "number"
+          },
+          "stroke": {
+            "type": "string"
+          },
+          "strokeWidth": {
+            "type": "number"
+          },
+          "opacity": {
+            "type": "number"
+          },
+          "dashed": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "x1",
+          "y1",
+          "x2",
+          "y2"
+        ],
+        "additionalProperties": false,
+        "id": "Line",
+        "description": "dashed draws a dashed line."
+      },
+      "Path": {
+        "type": "object",
+        "properties": {
+          "d": {
+            "type": "string"
+          },
+          "fill": {
+            "type": "string"
+          },
+          "stroke": {
+            "type": "string"
+          },
+          "strokeWidth": {
+            "type": "number"
+          },
+          "opacity": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "d"
+        ],
+        "additionalProperties": false,
+        "id": "Path",
+        "description": "d uses M L H V C S Q T A Z commands with numbers only."
+      },
+      "Polyline": {
+        "type": "object",
+        "properties": {
+          "points": {
+            "type": "string"
+          },
+          "stroke": {
+            "type": "string"
+          },
+          "strokeWidth": {
+            "type": "number"
+          },
+          "fill": {
+            "type": "string"
+          },
+          "opacity": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "points"
+        ],
+        "additionalProperties": false,
+        "id": "Polyline",
+        "description": "points like \"0,0 10,5 20,0\". Build a curve from data with @Join(@Each(xs, \"x\", x + \",\" + f), \" \")."
+      },
+      "Polygon": {
+        "type": "object",
+        "properties": {
+          "points": {
+            "type": "string"
+          },
+          "fill": {
+            "type": "string"
+          },
+          "stroke": {
+            "type": "string"
+          },
+          "strokeWidth": {
+            "type": "number"
+          },
+          "opacity": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "points"
+        ],
+        "additionalProperties": false,
+        "id": "Polygon"
+      },
+      "G": {
+        "type": "object",
+        "properties": {
+          "children": {
+            "type": "array",
+            "items": {}
+          },
+          "transform": {
+            "type": "string"
+          },
+          "opacity": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "children"
+        ],
+        "additionalProperties": false,
+        "id": "G",
+        "description": "Group; transform like \"rotate(30 50 50)\" or \"translate(10 0)\"."
+      },
+      "SvgText": {
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": "string"
+          },
+          "x": {
+            "type": "number"
+          },
+          "y": {
+            "type": "number"
+          },
+          "size": {
+            "type": "number"
+          },
+          "fill": {
+            "type": "string"
+          },
+          "anchor": {
+            "type": "string",
+            "enum": [
+              "start",
+              "middle",
+              "end"
+            ]
+          },
+          "weight": {
+            "type": "string",
+            "enum": [
+              "normal",
+              "medium",
+              "semibold"
+            ]
+          }
+        },
+        "required": [
+          "text",
+          "x",
+          "y"
+        ],
+        "additionalProperties": false,
+        "id": "SvgText",
+        "description": "A label inside an Svg. Plain text only."
+      },
+      "Chart": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "line",
+              "area",
+              "bar",
+              "scatter"
+            ]
+          },
+          "data": {
+            "type": "array",
+            "items": {}
+          },
+          "x": {
+            "type": "string"
+          },
+          "y": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "xLabel": {
+            "type": "string"
+          },
+          "yLabel": {
+            "type": "string"
+          },
+          "height": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "kind",
+          "data",
+          "x",
+          "y"
+        ],
+        "additionalProperties": false,
+        "id": "Chart",
+        "description": "Chart of rows: data is a list of objects, x the key of the horizontal value, y the keys of one or more series. line, area and scatter need numeric x; bar treats x as category labels. Example: Chart(\"line\", @Each(@Linspace(0, 6.3, 80), \"t\", {t: t, v: @Sin(t)}), \"t\", [\"v\"], \"t (rad)\", \"sin t\")."
+      },
+      "Scene3D": {
+        "type": "object",
+        "properties": {
+          "points": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "x": {
+                  "type": "number"
+                },
+                "y": {
+                  "type": "number"
+                },
+                "z": {
+                  "type": "number"
+                },
+                "label": {
+                  "anyOf": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "string"
+                    }
+                  ]
+                }
+              },
+              "required": [
+                "x",
+                "y",
+                "z"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "plane": {
+            "type": "object",
+            "properties": {
+              "w": {
+                "type": "array",
+                "prefixItems": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "number"
+                  }
+                ]
+              },
+              "b": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "w",
+              "b"
+            ],
+            "additionalProperties": false
+          },
+          "azimuth": {
+            "type": "number"
+          },
+          "elevation": {
+            "type": "number"
+          },
+          "extent": {
+            "type": "number"
+          },
+          "height": {
+            "type": "number"
+          },
+          "axisLabels": {
+            "type": "array",
+            "prefixItems": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "type": "string"
+              }
+            ]
+          }
+        },
+        "required": [
+          "points"
+        ],
+        "additionalProperties": false,
+        "id": "Scene3D",
+        "description": "Rotatable 3D scatter plot for spatial data. points is a list of {x, y, z, label?}; optional labels distinguish groups. azimuth and elevation (degrees) may be bound to sliders. extent sets the half-width of the axes; omit it to fit the data."
+      }
+    },
+    "functions": {
+      "Sin": {
+        "description": "Sine of an angle in radians",
+        "params": {
+          "type": "object",
+          "properties": {
+            "number": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "number"
+          ],
+          "additionalProperties": false
+        },
+        "returns": {
+          "type": "number"
+        }
+      },
+      "Cos": {
+        "description": "Cosine of an angle in radians",
+        "params": {
+          "type": "object",
+          "properties": {
+            "number": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "number"
+          ],
+          "additionalProperties": false
+        },
+        "returns": {
+          "type": "number"
+        }
+      },
+      "Tan": {
+        "description": "Tangent of an angle in radians",
+        "params": {
+          "type": "object",
+          "properties": {
+            "number": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "number"
+          ],
+          "additionalProperties": false
+        },
+        "returns": {
+          "type": "number"
+        }
+      },
+      "Atan2": {
+        "description": "Angle in radians of the point (x, y) from the x axis",
+        "params": {
+          "type": "object",
+          "properties": {
+            "y": {
+              "type": "number"
+            },
+            "x": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "y",
+            "x"
+          ],
+          "additionalProperties": false
+        },
+        "returns": {
+          "type": "number"
+        }
+      },
+      "Exp": {
+        "description": "e raised to number",
+        "params": {
+          "type": "object",
+          "properties": {
+            "number": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "number"
+          ],
+          "additionalProperties": false
+        },
+        "returns": {
+          "type": "number"
+        }
+      },
+      "Ln": {
+        "description": "Natural logarithm; null for zero or a negative number",
+        "params": {
+          "type": "object",
+          "properties": {
+            "number": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "number"
+          ],
+          "additionalProperties": false
+        },
+        "returns": {
+          "type": "number"
+        }
+      },
+      "Absolute": {
+        "description": "Absolute value",
+        "params": {
+          "type": "object",
+          "properties": {
+            "number": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "number"
+          ],
+          "additionalProperties": false
+        },
+        "returns": {
+          "type": "number"
+        }
+      },
+      "Sqrt": {
+        "description": "Square root; null for a negative number",
+        "params": {
+          "type": "object",
+          "properties": {
+            "number": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "number"
+          ],
+          "additionalProperties": false
+        },
+        "returns": {
+          "type": "number"
+        }
+      },
+      "Pow": {
+        "description": "base raised to exponent",
+        "params": {
+          "type": "object",
+          "properties": {
+            "base": {
+              "type": "number"
+            },
+            "exponent": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "base",
+            "exponent"
+          ],
+          "additionalProperties": false
+        },
+        "returns": {
+          "type": "number"
+        }
+      },
+      "FloorValue": {
+        "description": "Largest whole number not above number",
+        "params": {
+          "type": "object",
+          "properties": {
+            "number": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "number"
+          ],
+          "additionalProperties": false
+        },
+        "returns": {
+          "type": "number"
+        }
+      },
+      "Ceiling": {
+        "description": "Smallest whole number not below number",
+        "params": {
+          "type": "object",
+          "properties": {
+            "number": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "number"
+          ],
+          "additionalProperties": false
+        },
+        "returns": {
+          "type": "number"
+        }
+      },
+      "Clamp": {
+        "description": "number kept between min and max",
+        "params": {
+          "type": "object",
+          "properties": {
+            "number": {
+              "type": "number"
+            },
+            "min": {
+              "type": "number"
+            },
+            "max": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "number",
+            "min",
+            "max"
+          ],
+          "additionalProperties": false
+        },
+        "returns": {
+          "type": "number"
+        }
+      },
+      "Lerp": {
+        "description": "The value a fraction t of the way from a to b",
+        "params": {
+          "type": "object",
+          "properties": {
+            "a": {
+              "type": "number"
+            },
+            "b": {
+              "type": "number"
+            },
+            "t": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "a",
+            "b",
+            "t"
+          ],
+          "additionalProperties": false
+        },
+        "returns": {
+          "type": "number"
+        }
+      },
+      "Dot": {
+        "description": "Dot product of two number lists of equal length",
+        "params": {
+          "type": "object",
+          "properties": {
+            "a": {
+              "type": "array",
+              "items": {
+                "type": "number"
+              }
+            },
+            "b": {
+              "type": "array",
+              "items": {
+                "type": "number"
+              }
+            }
+          },
+          "required": [
+            "a",
+            "b"
+          ],
+          "additionalProperties": false
+        },
+        "returns": {
+          "type": "number"
+        }
+      },
+      "Norm": {
+        "description": "Euclidean length of a number list",
+        "params": {
+          "type": "object",
+          "properties": {
+            "list": {
+              "type": "array",
+              "items": {
+                "type": "number"
+              }
+            }
+          },
+          "required": [
+            "list"
+          ],
+          "additionalProperties": false
+        },
+        "returns": {
+          "type": "number"
+        }
+      },
+      "Range": {
+        "description": "Numbers from start up to end (not included) by step (default 1), e.g. @Range(0, 3) is [0, 1, 2]",
+        "params": {
+          "type": "object",
+          "properties": {
+            "start": {
+              "type": "number"
+            },
+            "end": {
+              "type": "number"
+            },
+            "step": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "start",
+            "end"
+          ],
+          "additionalProperties": false
+        },
+        "returns": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          }
+        }
+      },
+      "Linspace": {
+        "description": "count evenly spaced numbers from start to end, both included, e.g. @Linspace(0, 1, 5) is [0, 0.25, 0.5, 0.75, 1]",
+        "params": {
+          "type": "object",
+          "properties": {
+            "start": {
+              "type": "number"
+            },
+            "end": {
+              "type": "number"
+            },
+            "count": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "start",
+            "end",
+            "count"
+          ],
+          "additionalProperties": false
+        },
+        "returns": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          }
+        }
+      },
+      "Append": {
+        "description": "Copy of the list with item added at the end",
+        "params": {
+          "type": "object",
+          "properties": {
+            "list": {
+              "type": "array",
+              "items": {}
+            },
+            "item": {}
+          },
+          "required": [
+            "list",
+            "item"
+          ],
+          "additionalProperties": false
+        },
+        "returns": {
+          "type": "array",
+          "items": {}
+        }
+      },
+      "Toggle": {
+        "description": "Adds item if missing, removes it if present (a set of strings or numbers)",
+        "params": {
+          "type": "object",
+          "properties": {
+            "list": {
+              "type": "array",
+              "items": {}
+            },
+            "item": {}
+          },
+          "required": [
+            "list",
+            "item"
+          ],
+          "additionalProperties": false
+        },
+        "returns": {
+          "type": "array",
+          "items": {}
+        }
+      },
+      "Includes": {
+        "description": "True if the list has item, or the text contains it",
+        "params": {
+          "type": "object",
+          "properties": {
+            "list": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {}
+                },
+                {
+                  "type": "string"
+                }
+              ]
+            },
+            "item": {}
+          },
+          "required": [
+            "list",
+            "item"
+          ],
+          "additionalProperties": false
+        },
+        "returns": {
+          "type": "boolean"
+        }
+      },
+      "Take": {
+        "description": "The first n items; a negative n takes the last n",
+        "params": {
+          "type": "object",
+          "properties": {
+            "list": {
+              "type": "array",
+              "items": {}
+            },
+            "n": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "list",
+            "n"
+          ],
+          "additionalProperties": false
+        },
+        "returns": {
+          "type": "array",
+          "items": {}
+        }
+      },
+      "Reverse": {
+        "description": "Copy in reverse order",
+        "params": {
+          "type": "object",
+          "properties": {
+            "list": {
+              "type": "array",
+              "items": {}
+            }
+          },
+          "required": [
+            "list"
+          ],
+          "additionalProperties": false
+        },
+        "returns": {
+          "type": "array",
+          "items": {}
+        }
+      },
+      "Fixed": {
+        "description": "number as text with exactly decimals digits (0 to 8), e.g. @Fixed(3.14159, 2) is \"3.14\"",
+        "params": {
+          "type": "object",
+          "properties": {
+            "number": {
+              "type": "number"
+            },
+            "decimals": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "number",
+            "decimals"
+          ],
+          "additionalProperties": false
+        },
+        "returns": {
+          "type": "string"
+        }
+      },
+      "Join": {
+        "description": "List items as one text, separated by separator (default \", \")",
+        "params": {
+          "type": "object",
+          "properties": {
+            "list": {
+              "type": "array",
+              "items": {}
+            },
+            "separator": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "list"
+          ],
+          "additionalProperties": false
+        },
+        "returns": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}
