@@ -12,6 +12,44 @@ import blockCss from "./renderer.css?inline";
 
 let host: any = null;
 
+/** Dynamically detect PI-Desktop active host theme (light vs dark) */
+function useHostTheme(): "dark" | "light" {
+  const [theme, setTheme] = useState<"dark" | "light">(() => {
+    if (typeof document === "undefined") return "dark";
+    const attr = document.documentElement.getAttribute("data-theme");
+    if (attr === "light") return "light";
+    if (attr === "dark") return "dark";
+    if (document.documentElement.classList.contains("light")) return "light";
+    if (document.documentElement.classList.contains("dark")) return "dark";
+    return window.matchMedia?.("(prefers-color-scheme: light)").matches ? "light" : "dark";
+  });
+
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    const update = () => {
+      const attr = document.documentElement.getAttribute("data-theme");
+      if (attr === "light") setTheme("light");
+      else if (attr === "dark") setTheme("dark");
+      else if (document.documentElement.classList.contains("light")) setTheme("light");
+      else if (document.documentElement.classList.contains("dark")) setTheme("dark");
+      else setTheme(window.matchMedia?.("(prefers-color-scheme: light)").matches ? "light" : "dark");
+    };
+
+    const observer = new MutationObserver(update);
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme", "class"] });
+
+    const mql = window.matchMedia?.("(prefers-color-scheme: light)");
+    mql?.addEventListener?.("change", update);
+
+    return () => {
+      observer.disconnect();
+      mql?.removeEventListener?.("change", update);
+    };
+  }, []);
+
+  return theme;
+}
+
 interface ErrorBoundaryProps {
   children: ReactNode;
   fallback?: (error: Error) => ReactNode;
@@ -58,6 +96,7 @@ export function OpenUIBlockComponent({ language, source }: OpenUIBlockProps) {
   const [showSource, setShowSource] = useState(false);
   const [copied, setCopied] = useState(false);
   const [errors, setErrors] = useState<string[]>([]);
+  const hostTheme = useHostTheme();
 
   const code = useMemo(() => {
     let text = (source || "").trim();
@@ -106,24 +145,6 @@ export function OpenUIBlockComponent({ language, source }: OpenUIBlockProps) {
         <div className="pi-openui-tag">
           <OpenUIIcon size={18} />
           <span className="pi-openui-title">OpenUi</span>
-          {errors.length > 0 && (
-            <span
-              className="pi-openui-warning-badge"
-              onClick={() => setShowSource(true)}
-              title="Click to view syntax warnings in Source tab"
-              style={{
-                fontSize: "11px",
-                padding: "1px 6px",
-                borderRadius: "10px",
-                background: "rgba(234, 179, 8, 0.15)",
-                color: "#facc15",
-                cursor: "pointer",
-                marginLeft: "4px",
-              }}
-            >
-              ⚠️ {errors.length} {errors.length === 1 ? "warning" : "warnings"}
-            </span>
-          )}
         </div>
         <div className="pi-openui-actions">
           <button
@@ -172,7 +193,7 @@ export function OpenUIBlockComponent({ language, source }: OpenUIBlockProps) {
               </div>
             )}
           >
-            <ThemeProvider mode="dark">
+            <ThemeProvider mode={hostTheme}>
               <Renderer
                 key={code}
                 response={code}
@@ -214,56 +235,114 @@ export function OpenUIEntryExtraComponent({ message }: { message: { content?: st
 }
 
 export function OpenUIComposerControl({ position }: { position?: string }) {
-  const [enabled, setEnabled] = useState(true);
+  const [config, setConfig] = useState({
+    enabled: true,
+    enable3D: true,
+    enableDrawio: true,
+  });
+  const [showMenu, setShowMenu] = useState(false);
 
-  // Read initial mode from plugin process
+  // Read initial configuration from plugin process
   useEffect(() => {
     if (host && typeof host.dispatch === "function") {
       host
-        .dispatch("plugin.call", { method: "openui.getMode" })
+        .dispatch("plugin.call", { method: "openui.getConfig" })
         .then((res: any) => {
-          if (res && typeof res.enabled === "boolean") {
-            setEnabled(res.enabled);
+          if (res && typeof res === "object") {
+            setConfig({
+              enabled: res.enabled !== false,
+              enable3D: res.enable3D !== false,
+              enableDrawio: res.enableDrawio !== false,
+            });
           }
         })
         .catch(() => {});
     }
   }, []);
 
-  const handleToggle = useCallback(async () => {
-    const nextState = !enabled;
-    setEnabled(nextState);
-
+  const updateConfig = useCallback(async (newCfg: Partial<typeof config>) => {
+    const merged = { ...config, ...newCfg };
+    setConfig(merged);
     try {
       if (host && typeof host.dispatch === "function") {
         await host.dispatch("plugin.call", {
-          method: "openui.setMode",
-          args: { enabled: nextState },
+          method: "openui.setConfig",
+          args: merged,
         });
-
-        // If toggled ON, insert /openui command prompt into composer
-        if (nextState) {
-          await host.dispatch("composer.insertText", {
-            text: "/openui ",
-          });
-        }
       }
     } catch (err) {
-      console.warn("[OpenUI] Failed to update mode:", err);
+      console.warn("[OpenUI] Failed to update config:", err);
     }
-  }, [enabled]);
+  }, [config]);
+
+  const handleToggle = useCallback(async () => {
+    const nextState = !config.enabled;
+    await updateConfig({ enabled: nextState });
+
+    // If toggled ON, insert /openui command prompt into composer
+    if (nextState && host && typeof host.dispatch === "function") {
+      try {
+        await host.dispatch("composer.insertText", {
+          text: "/openui ",
+        });
+      } catch {}
+    }
+  }, [config.enabled, updateConfig]);
 
   return (
-    <button
-      type="button"
-      className={`pi-openui-composer-btn ${enabled ? "is-active" : "is-inactive"}`}
-      onClick={handleToggle}
-      title={enabled ? "OpenUI active (click to toggle)" : "OpenUI inactive (click to enable)"}
-    >
-      <OpenUIIcon size={16} active={enabled} />
-      <span>OpenUi</span>
-      <span className={`pi-openui-state-dot ${enabled ? "" : "is-off"}`} />
-    </button>
+    <div className="pi-openui-composer-wrapper">
+      <button
+        type="button"
+        className={`pi-openui-composer-btn ${config.enabled ? "is-active" : "is-inactive"}`}
+        onClick={handleToggle}
+        onContextMenu={(e) => {
+          e.preventDefault();
+          setShowMenu((m) => !m);
+        }}
+        title="OpenUI Rendering (Click to toggle, right-click for 3D/Drawio settings)"
+      >
+        <OpenUIIcon size={16} active={config.enabled} />
+        <span>OpenUi</span>
+        <span className={`pi-openui-state-dot ${config.enabled ? "" : "is-off"}`} />
+      </button>
+
+      <button
+        type="button"
+        className="pi-openui-composer-btn"
+        style={{ padding: "0 4px", fontSize: "10px", opacity: 0.7 }}
+        onClick={() => setShowMenu((m) => !m)}
+        title="OpenUI settings (3D & Drawio toggles)"
+      >
+        ⚙
+      </button>
+
+      {showMenu && (
+        <div className="pi-openui-popover">
+          <div className="pi-openui-popover-title">OpenUI Modules</div>
+          <label className="pi-openui-popover-item">
+            <span>🧊 Three.js 3D</span>
+            <input
+              type="checkbox"
+              checked={config.enable3D}
+              onChange={(e) => updateConfig({ enable3D: e.target.checked })}
+              style={{ accentColor: "#9333ea" }}
+            />
+          </label>
+          <label className="pi-openui-popover-item">
+            <span>📐 Draw.io Diagrams</span>
+            <input
+              type="checkbox"
+              checked={config.enableDrawio}
+              onChange={(e) => updateConfig({ enableDrawio: e.target.checked })}
+              style={{ accentColor: "#9333ea" }}
+            />
+          </label>
+          <div style={{ marginTop: "4px", paddingTop: "4px", borderTop: "1px solid rgba(255,255,255,0.1)", fontSize: "10px", color: "#a1a1aa", textAlign: "right" }}>
+            <span style={{ cursor: "pointer" }} onClick={() => setShowMenu(false)}>Close ✕</span>
+          </div>
+        </div>
+      )}
+    </div>
   );
 }
 

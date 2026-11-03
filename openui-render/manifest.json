@@ -12,6 +12,8 @@
     "composer.insertText"
   ],
   "rendererCallMethods": [
+    "openui.getConfig",
+    "openui.setConfig",
     "openui.getMode",
     "openui.setMode",
     "study.getMode",
@@ -22,6 +24,22 @@
     "agent.extension"
   ],
   "contributes": {
+    "settings": [
+      {
+        "key": "enable3D",
+        "title": "Enable Three.js 3D Graphics",
+        "description": "Inject Three.js 3D visualization prompt instructions and enable Three3D rendering in OpenUI.",
+        "type": "boolean",
+        "default": true
+      },
+      {
+        "key": "enableDrawio",
+        "title": "Enable Draw.io Diagrams",
+        "description": "Inject Draw.io / diagrams.net architecture diagramming instructions and enable Drawio rendering in OpenUI.",
+        "type": "boolean",
+        "default": true
+      }
+    ],
     "agentExtensions": [
       "agent/extension.ts"
     ],

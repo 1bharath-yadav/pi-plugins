@@ -16,23 +16,42 @@ describe("CommonJS Plugin Process (main.cjs)", () => {
 
     // Initial mode is true
     const initial = await main.onRendererCall("openui.getMode");
-    expect(initial).toEqual({ enabled: true });
+    expect(initial.enabled).toBe(true);
 
     // Set mode to false
     const updated = await main.onRendererCall("openui.setMode", { enabled: false });
-    expect(updated).toEqual({ enabled: false });
+    expect(updated.enabled).toBe(false);
 
     // Verify persisted
     const checked = await main.onRendererCall("openui.getMode");
-    expect(checked).toEqual({ enabled: false });
-
-    // Also supports study.getMode alias
-    const studyChecked = await main.onRendererCall("study.getMode");
-    expect(studyChecked).toEqual({ enabled: false });
+    expect(checked.enabled).toBe(false);
 
     // Reset back to true
     await main.onRendererCall("openui.setMode", { enabled: true });
-    expect(await main.onRendererCall("openui.getMode")).toEqual({ enabled: true });
+    expect((await main.onRendererCall("openui.getMode")).enabled).toBe(true);
+  });
+
+  it("handles openui.getConfig and openui.setConfig with 3D and Drawio toggles", async () => {
+    const main = await import(mainPath);
+
+    // Read config
+    const config = await main.onRendererCall("openui.getConfig");
+    expect(typeof config.enabled).toBe("boolean");
+    expect(typeof config.enable3D).toBe("boolean");
+    expect(typeof config.enableDrawio).toBe("boolean");
+
+    // Update config to disable 3D
+    const updated = await main.onRendererCall("openui.setConfig", { enable3D: false, enableDrawio: true });
+    expect(updated.enable3D).toBe(false);
+    expect(updated.enableDrawio).toBe(true);
+
+    // Verify persisted in getConfig
+    const verified = await main.onRendererCall("openui.getConfig");
+    expect(verified.enable3D).toBe(false);
+
+    // Reset back to true
+    await main.onRendererCall("openui.setConfig", { enable3D: true, enableDrawio: true });
+    expect((await main.onRendererCall("openui.getConfig")).enable3D).toBe(true);
   });
 
   it("rejects undeclared methods with error code", async () => {

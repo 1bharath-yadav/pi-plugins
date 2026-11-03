@@ -1,5 +1,6 @@
 import { describe, expect, it } from "bun:test";
 import agentExtension from "../agent/extension";
+import { getOpenuiSystemPrompt } from "../src/openui-prompt";
 
 describe("Pi Agent Harness Trusted Extension (agent/extension.ts)", () => {
   it("registers before_agent_start hook and slash commands", () => {
@@ -51,6 +52,23 @@ describe("Pi Agent Harness Trusted Extension (agent/extension.ts)", () => {
     // Case 2: Already injected
     const res2 = beforeAgentStart({ systemPrompt: res1.systemPrompt });
     expect(res2.systemPrompt).toBe(res1.systemPrompt);
+  });
+
+  it("dynamically configures 3D and Drawio prompt injection", () => {
+    // Both enabled
+    const fullPrompt = getOpenuiSystemPrompt({ enable3D: true, enableDrawio: true });
+    expect(fullPrompt).toContain("Three3D");
+    expect(fullPrompt).toContain("Drawio");
+
+    // Disable 3D
+    const no3D = getOpenuiSystemPrompt({ enable3D: false, enableDrawio: true });
+    expect(no3D).not.toContain("Three3D");
+    expect(no3D).toContain("Drawio");
+
+    // Disable Drawio
+    const noDrawio = getOpenuiSystemPrompt({ enable3D: true, enableDrawio: false });
+    expect(noDrawio).toContain("Three3D");
+    expect(noDrawio).not.toContain("Drawio");
   });
 
   it("handles /openui command with args", async () => {
