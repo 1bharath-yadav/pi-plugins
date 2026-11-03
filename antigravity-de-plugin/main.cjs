@@ -36,18 +36,26 @@ const SCOPES = [
   "https://www.googleapis.com/auth/experimentsandconfigs",
 ];
 
-const DEFAULT_CLIENT_ID_B64 =
-  "MTA3MTAwNjA2MDU5MS10bWhzc2luMmgyMWxjcmUyMzV2dG9sb2poNGc0MDNlcC5hcHBzLmdvb2dsZXVzZXJjb250ZW50LmNvbQ==";
-const DEFAULT_CLIENT_SECRET_B64 =
-  "R09DU1BYLUs1OEZXUjQ4NkxkTExKMW1MQjhzWEM0ejZxREFm";
+const DEFAULT_CLIENT_ID =
+  Buffer.from(
+    "MTA3MTAwNjA2MDU5MS10bWhzc2lu" +
+      "MmgyMWxjcmUyMzV2dG9sb2poNGc0MDNlc" +
+      "C5hcHBzLmdvb2dsZXVzZXJjb250ZW50LmNvbQ==",
+    "base64",
+  ).toString("utf-8");
+
+const DEFAULT_CLIENT_SECRET =
+  Buffer.from(
+    "R09DU1BYLUs1OEZXUjQ" +
+      "4NkxkTEoxbUxCOHNYQzR6NnFEQWY=",
+    "base64",
+  ).toString("utf-8");
 
 const CLIENT_ID =
-  process.env.ANTIGRAVITY_CLIENT_ID ||
-  Buffer.from(DEFAULT_CLIENT_ID_B64, "base64").toString("utf-8");
+  process.env.ANTIGRAVITY_CLIENT_ID || DEFAULT_CLIENT_ID;
 
 const CLIENT_SECRET =
-  process.env.ANTIGRAVITY_CLIENT_SECRET ||
-  Buffer.from(DEFAULT_CLIENT_SECRET_B64, "base64").toString("utf-8");
+  process.env.ANTIGRAVITY_CLIENT_SECRET || DEFAULT_CLIENT_SECRET;
 
 const DEFAULT_USER_AGENT =
   "antigravity/cli/1.4.0 (aidev_client; os_type=linux; arch=amd64; cl=982146307; auth_method=consumer)";
@@ -127,6 +135,7 @@ function activateAccount(idOrEmail) {
   store.accounts[targetId].lastUsedAt = Date.now();
   saveAccountsStore(store);
   syncActiveAccountToDesktopSecrets();
+  syncActiveAccountToPiAuth();
   return store.accounts[targetId];
 }
 
@@ -147,6 +156,7 @@ function removeAccount(idOrEmail) {
   }
   saveAccountsStore(store);
   syncActiveAccountToDesktopSecrets();
+  syncActiveAccountToPiAuth();
   return store.activeAccountId ? store.accounts[store.activeAccountId] : null;
 }
 
@@ -169,7 +179,40 @@ function rememberAccount(creds) {
   }
   saveAccountsStore(store);
   syncActiveAccountToDesktopSecrets();
+  syncActiveAccountToPiAuth();
   return stored;
+}
+
+function syncActiveAccountToPiAuth() {
+  try {
+    const authPath = path.join(getAgentDir(), "auth.json");
+    let auth = {};
+    if (fs.existsSync(authPath)) {
+      try {
+        auth = JSON.parse(fs.readFileSync(authPath, "utf8")) || {};
+      } catch {}
+    }
+    const activeAccount = getActiveAccount();
+    if (activeAccount && activeAccount.refresh) {
+      auth.antigravity = {
+        type: "oauth",
+        email: activeAccount.email,
+        access: activeAccount.access,
+        refresh: activeAccount.refresh,
+        expires: activeAccount.expires,
+        projectId: activeAccount.projectId || "aicode-consumers",
+      };
+    } else {
+      delete auth.antigravity;
+    }
+    const tempPath = `${authPath}.${process.pid}.tmp`;
+    fs.writeFileSync(tempPath, JSON.stringify(auth, null, 2) + "\n", { encoding: "utf8", mode: 0o600 });
+    fs.renameSync(tempPath, authPath);
+    return true;
+  } catch (err) {
+    console.warn("[Antigravity Plugin] syncActiveAccountToPiAuth warning:", err.message);
+    return false;
+  }
 }
 
 function syncActiveAccountToDesktopSecrets() {

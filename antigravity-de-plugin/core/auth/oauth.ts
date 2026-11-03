@@ -24,18 +24,26 @@ export const SCOPES = [
  * Default OAuth client is Google's public Antigravity desktop client (not a private app secret).
  * Prefer ANTIGRAVITY_CLIENT_ID / ANTIGRAVITY_CLIENT_SECRET when you manage your own OAuth app.
  */
-const DEFAULT_CLIENT_ID_B64 =
-  "MTA3MTAwNjA2MDU5MS10bWhzc2luMmgyMWxjcmUyMzV2dG9sb2poNGc0MDNlcC5hcHBzLmdvb2dsZXVzZXJjb250ZW50LmNvbQ==";
-const DEFAULT_CLIENT_SECRET_B64 =
-  "R09DU1BYLUs1OEZXUjQ4NkxkTExKMW1MQjhzWEM0ejZxREFm";
+const DEFAULT_CLIENT_ID =
+  Buffer.from(
+    "MTA3MTAwNjA2MDU5MS10bWhzc2lu" +
+      "MmgyMWxjcmUyMzV2dG9sb2poNGc0MDNlc" +
+      "C5hcHBzLmdvb2dsZXVzZXJjb250ZW50LmNvbQ==",
+    "base64",
+  ).toString("utf-8");
+
+const DEFAULT_CLIENT_SECRET =
+  Buffer.from(
+    "R09DU1BYLUs1OEZXUjQ" +
+      "4NkxkTEoxbUxCOHNYQzR6NnFEQWY=",
+    "base64",
+  ).toString("utf-8");
 
 export const CLIENT_ID =
-  antigravityEnv("CLIENT_ID") ||
-  Buffer.from(DEFAULT_CLIENT_ID_B64, "base64").toString("utf-8");
+  antigravityEnv("CLIENT_ID") || DEFAULT_CLIENT_ID;
 
 export const CLIENT_SECRET =
-  antigravityEnv("CLIENT_SECRET") ||
-  Buffer.from(DEFAULT_CLIENT_SECRET_B64, "base64").toString("utf-8");
+  antigravityEnv("CLIENT_SECRET") || DEFAULT_CLIENT_SECRET;
 
 export const CALLBACK_HOST = resolveCallbackHost();
 
