@@ -13,30 +13,52 @@ import blockCss from "./renderer.css?inline";
 let host: any = null;
 
 /** Dynamically detect PI-Desktop active host theme (light vs dark) */
+function readHostColorScheme(): "dark" | "light" {
+  if (typeof document === "undefined") return "dark";
+  const html = document.documentElement;
+  const body = document.body;
+
+  // 1. Explicit data-theme attributes
+  const attr = html.getAttribute("data-theme") || body?.getAttribute("data-theme");
+  if (attr === "light") return "light";
+  if (attr === "dark") return "dark";
+
+  // 2. Class names
+  if (html.classList.contains("light") || body?.classList.contains("light")) return "light";
+  if (html.classList.contains("dark") || body?.classList.contains("dark")) return "dark";
+
+  // 3. Computed style colorScheme or background brightness
+  if (typeof getComputedStyle !== "undefined") {
+    try {
+      const scheme = getComputedStyle(html).colorScheme || getComputedStyle(body || html).colorScheme;
+      if (/\blight\b/.test(scheme)) return "light";
+      if (/\bdark\b/.test(scheme)) return "dark";
+
+      const bg = getComputedStyle(body || html).backgroundColor;
+      const rgb = bg.match(/\d+/g);
+      if (rgb && rgb.length >= 3) {
+        const brightness = (Number(rgb[0]) * 299 + Number(rgb[1]) * 587 + Number(rgb[2]) * 114) / 1000;
+        if (brightness > 160) return "light";
+      }
+    } catch {}
+  }
+
+  // 4. System preference
+  return window.matchMedia?.("(prefers-color-scheme: light)").matches ? "light" : "dark";
+}
+
 function useHostTheme(): "dark" | "light" {
-  const [theme, setTheme] = useState<"dark" | "light">(() => {
-    if (typeof document === "undefined") return "dark";
-    const attr = document.documentElement.getAttribute("data-theme");
-    if (attr === "light") return "light";
-    if (attr === "dark") return "dark";
-    if (document.documentElement.classList.contains("light")) return "light";
-    if (document.documentElement.classList.contains("dark")) return "dark";
-    return window.matchMedia?.("(prefers-color-scheme: light)").matches ? "light" : "dark";
-  });
+  const [theme, setTheme] = useState<"dark" | "light">(readHostColorScheme);
 
   useEffect(() => {
     if (typeof document === "undefined") return;
-    const update = () => {
-      const attr = document.documentElement.getAttribute("data-theme");
-      if (attr === "light") setTheme("light");
-      else if (attr === "dark") setTheme("dark");
-      else if (document.documentElement.classList.contains("light")) setTheme("light");
-      else if (document.documentElement.classList.contains("dark")) setTheme("dark");
-      else setTheme(window.matchMedia?.("(prefers-color-scheme: light)").matches ? "light" : "dark");
-    };
+    const update = () => setTheme(readHostColorScheme());
 
     const observer = new MutationObserver(update);
-    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme", "class"] });
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme", "data-plugin-theme", "class", "style"] });
+    if (document.body) {
+      observer.observe(document.body, { attributes: true, attributeFilter: ["data-theme", "class", "style"] });
+    }
 
     const mql = window.matchMedia?.("(prefers-color-scheme: light)");
     mql?.addEventListener?.("change", update);
@@ -145,6 +167,25 @@ export function OpenUIBlockComponent({ language, source }: OpenUIBlockProps) {
         <div className="pi-openui-tag">
           <OpenUIIcon size={18} />
           <span className="pi-openui-title">OpenUi</span>
+          {errors.length > 0 && (
+            <span
+              className="pi-openui-warning-badge"
+              onClick={() => setShowSource(true)}
+              title="Click to view syntax warnings in Source tab"
+              style={{
+                fontSize: "11px",
+                padding: "1px 6px",
+                borderRadius: "10px",
+                background: "rgba(234, 179, 8, 0.15)",
+                color: "#eab308",
+                cursor: "pointer",
+                marginLeft: "4px",
+                fontWeight: 600,
+              }}
+            >
+              ⚠️ {errors.length} {errors.length === 1 ? "warning" : "warnings"}
+            </span>
+          )}
         </div>
         <div className="pi-openui-actions">
           <button
@@ -337,7 +378,7 @@ export function OpenUIComposerControl({ position }: { position?: string }) {
               style={{ accentColor: "#9333ea" }}
             />
           </label>
-          <div style={{ marginTop: "4px", paddingTop: "4px", borderTop: "1px solid rgba(255,255,255,0.1)", fontSize: "10px", color: "#a1a1aa", textAlign: "right" }}>
+          <div style={{ marginTop: "4px", paddingTop: "4px", borderTop: "1px solid var(--openui-border)", fontSize: "10px", color: "var(--openui-text-neutral-secondary)", textAlign: "right" }}>
             <span style={{ cursor: "pointer" }} onClick={() => setShowMenu(false)}>Close ✕</span>
           </div>
         </div>

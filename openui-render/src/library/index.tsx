@@ -24,6 +24,15 @@ import { Scene3D } from "./scene3d";
 import { Drawio, Diagram } from "./drawio";
 import { Three3D } from "./three3d";
 
+/* Theme-responsive style tokens that seamlessly follow PI-Desktop */
+const FG_PRIMARY = "var(--openui-foreground, var(--ds-text-primary, currentColor))";
+const FG_SECONDARY = "var(--openui-text-neutral-secondary, var(--ds-text-secondary, var(--ds-text-muted, #71717a)))";
+const FG_MUTED = "var(--openui-text-neutral-tertiary, var(--ds-text-faint, #a1a1aa))";
+const BG_CARD = "var(--openui-popover-background, var(--ds-bg-elevated, rgba(125, 125, 125, 0.05)))";
+const BG_SUBTLE = "var(--openui-highlight, var(--ds-bg-chip, rgba(125, 125, 125, 0.06)))";
+const BORDER_DEFAULT = "var(--openui-border, var(--ds-border-default, rgba(125, 125, 125, 0.18)))";
+const BORDER_SUBTLE = "var(--openui-border-default, var(--ds-border-subtle, rgba(125, 125, 125, 0.1)))";
+
 // 1. Resilient CodeBlock: CodeBlock(code) or CodeBlock(language, code)
 export const CodeBlock = defineComponent({
   name: "CodeBlock",
@@ -78,7 +87,7 @@ function renderSteps({ props, renderNode }: { props: any; renderNode: any }) {
   return (
     <div className="olr-steps-wrapper" style={{ margin: "8px 0" }}>
       {title && (
-        <div className="olr-steps-title" style={{ fontWeight: 600, marginBottom: "8px", fontSize: "13px", color: "#f4f4f5" }}>
+        <div className="olr-steps-title" style={{ fontWeight: 600, marginBottom: "8px", fontSize: "13px", color: FG_PRIMARY }}>
           {title}
         </div>
       )}
@@ -144,15 +153,16 @@ export const Card = defineComponent({
       <div
         className="openui-card"
         style={{
-          border: "1px solid rgba(255, 255, 255, 0.1)",
+          border: `1px solid ${BORDER_DEFAULT}`,
           borderRadius: "8px",
           padding: "12px 14px",
-          background: "rgba(255, 255, 255, 0.03)",
+          background: BG_CARD,
+          color: FG_PRIMARY,
           margin: "6px 0",
         }}
       >
         {headerText && (
-          <div style={{ fontWeight: 600, fontSize: "14px", marginBottom: "8px", color: "#f4f4f5" }}>
+          <div style={{ fontWeight: 600, fontSize: "14px", marginBottom: "8px", color: FG_PRIMARY }}>
             {headerText}
           </div>
         )}
@@ -179,7 +189,7 @@ export const Text = defineComponent({
   component: ({ props }) => {
     const textVal = props.value ?? (typeof props.variant === "string" ? props.variant : String(props.variant ?? ""));
     return (
-      <span className="openui-text" style={{ fontSize: "13px", color: "var(--openui-foreground, #f4f4f5)" }}>
+      <span className="openui-text" style={{ fontSize: "13px", color: FG_PRIMARY }}>
         {textVal}
       </span>
     );
@@ -208,7 +218,7 @@ export const Slider = defineComponent({
     }
     return (
       <div style={{ margin: "6px 0" }}>
-        {props.label && <div style={{ fontSize: "12px", color: "#d4d4d8", marginBottom: "4px" }}>{props.label}</div>}
+        {props.label && <div style={{ fontSize: "12px", color: FG_SECONDARY, marginBottom: "4px" }}>{props.label}</div>}
         <input
           type="range"
           min={min}
@@ -233,9 +243,9 @@ export const FormControl = defineComponent({
   description: "Form field wrapper: FormControl(label, input, hint?)",
   component: ({ props, renderNode }) => (
     <div className="openui-form-control" style={{ margin: "8px 0", display: "flex", flexDirection: "column", gap: "4px" }}>
-      <label style={{ fontSize: "12px", fontWeight: 600, color: "#d4d4d8" }}>{props.label}</label>
+      <label style={{ fontSize: "12px", fontWeight: 600, color: FG_PRIMARY }}>{props.label}</label>
       {props.input && renderNode(props.input)}
-      {props.hint && <span style={{ fontSize: "11px", color: "#71717a" }}>{props.hint}</span>}
+      {props.hint && <span style={{ fontSize: "11px", color: FG_MUTED }}>{props.hint}</span>}
     </div>
   ),
 });
@@ -276,7 +286,7 @@ export const RadioGroup = defineComponent({
     defaultValue: z.any().optional(),
   }),
   description: "Radio group: RadioGroup(name, items, defaultValue?)",
-  component: ({ props, renderNode }) => {
+  component: ({ props }) => {
     let items = Array.isArray(props.items) ? props.items : Array.isArray(props.name) ? props.name : [];
     let groupName = typeof props.name === "string" ? props.name : "radio-group";
     let defaultVal = Array.isArray(props.defaultValue) ? props.defaultValue[0] : (props.defaultValue ?? "");
@@ -288,11 +298,11 @@ export const RadioGroup = defineComponent({
           const label = itemProps.label ?? `Choice ${idx + 1}`;
           const val = itemProps.value ?? label;
           return (
-            <label key={idx} style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "13px", color: "#e4e4e7", cursor: "pointer" }}>
+            <label key={idx} style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "13px", color: FG_PRIMARY, cursor: "pointer" }}>
               <input type="radio" name={groupName} value={val} defaultChecked={val === defaultVal} style={{ accentColor: "#9333ea" }} />
               <div>
                 <div>{label}</div>
-                {itemProps.description && <div style={{ fontSize: "11px", color: "#a1a1aa" }}>{itemProps.description}</div>}
+                {itemProps.description && <div style={{ fontSize: "11px", color: FG_SECONDARY }}>{itemProps.description}</div>}
               </div>
             </label>
           );
@@ -323,14 +333,14 @@ export const CheckBoxGroup = defineComponent({
     defaultValue: z.any().optional(),
   }),
   description: "Checkbox group: CheckBoxGroup(name, items)",
-  component: ({ props, renderNode }) => {
+  component: ({ props }) => {
     let items = Array.isArray(props.items) ? props.items : Array.isArray(props.name) ? props.name : [];
     return (
       <div style={{ display: "flex", flexDirection: "column", gap: "6px", margin: "6px 0" }}>
         {items.map((it: any, idx: number) => {
           const p = it?.props ?? it ?? {};
           return (
-            <label key={idx} style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "13px", color: "#e4e4e7", cursor: "pointer" }}>
+            <label key={idx} style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "13px", color: FG_PRIMARY, cursor: "pointer" }}>
               <input type="checkbox" defaultChecked={Boolean(p.defaultChecked ?? p.checked)} style={{ accentColor: "#9333ea" }} />
               <span>{p.label ?? p.name ?? `Item ${idx + 1}`}</span>
             </label>
@@ -360,7 +370,7 @@ export const SwitchGroup = defineComponent({
     items: z.any().optional(),
   }),
   description: "Switch group: SwitchGroup(name, items)",
-  component: ({ props, renderNode }) => {
+  component: ({ props }) => {
     let items = Array.isArray(props.items) ? props.items : Array.isArray(props.name) ? props.name : [];
     return (
       <div style={{ display: "flex", flexDirection: "column", gap: "6px", margin: "6px 0" }}>
@@ -368,7 +378,7 @@ export const SwitchGroup = defineComponent({
           const p = it?.props ?? it ?? {};
           const checked = typeof p.defaultChecked === "boolean" ? p.defaultChecked : typeof p.description === "boolean" ? p.description : false;
           return (
-            <label key={idx} style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "13px", color: "#e4e4e7", cursor: "pointer" }}>
+            <label key={idx} style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "13px", color: FG_PRIMARY, cursor: "pointer" }}>
               <input type="checkbox" role="switch" defaultChecked={checked} style={{ accentColor: "#9333ea" }} />
               <span>{p.label ?? p.name ?? `Switch ${idx + 1}`}</span>
             </label>
@@ -416,7 +426,7 @@ export const SectionBlock = defineComponent({
 
     return (
       <div className="openui-section-block" style={{ margin: "10px 0" }}>
-        {title && <h4 style={{ fontSize: "14px", fontWeight: 600, color: "#f4f4f5", marginBottom: "6px" }}>{title}</h4>}
+        {title && <h4 style={{ fontSize: "14px", fontWeight: 600, color: FG_PRIMARY, marginBottom: "6px" }}>{title}</h4>}
         <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
           {sections.map((sec: any, idx: number) => {
             const p = sec?.props ?? sec ?? {};
@@ -427,14 +437,14 @@ export const SectionBlock = defineComponent({
                 style={{
                   padding: "8px 12px",
                   borderRadius: "6px",
-                  background: "rgba(255, 255, 255, 0.04)",
-                  border: "1px solid rgba(255, 255, 255, 0.08)",
+                  background: BG_SUBTLE,
+                  border: `1px solid ${BORDER_SUBTLE}`,
                 }}
               >
-                <div style={{ fontWeight: 600, fontSize: "13px", color: "#e4e4e7", marginBottom: "4px" }}>
+                <div style={{ fontWeight: 600, fontSize: "13px", color: FG_PRIMARY, marginBottom: "4px" }}>
                   {typeof trig === "string" ? trig : renderNode(trig)}
                 </div>
-                <div>{typeof p.content === "string" ? p.content : renderNode(p.content)}</div>
+                <div style={{ color: FG_SECONDARY }}>{typeof p.content === "string" ? p.content : renderNode(p.content)}</div>
               </div>
             );
           })}
@@ -457,7 +467,7 @@ export const Carousel = defineComponent({
     return (
       <div className="openui-carousel-wrap" style={{ display: "flex", gap: "10px", overflowX: "auto", padding: "6px 0" }}>
         {slides.map((s: any, idx: number) => (
-          <div key={idx} style={{ flex: "0 0 85%", borderRadius: "8px", background: "rgba(255, 255, 255, 0.04)", border: "1px solid rgba(255, 255, 255, 0.08)", padding: "12px" }}>
+          <div key={idx} style={{ flex: "0 0 85%", borderRadius: "8px", background: BG_CARD, border: `1px solid ${BORDER_SUBTLE}`, padding: "12px", color: FG_PRIMARY }}>
             {Array.isArray(s) ? renderNode(s) : renderNode([s])}
           </div>
         ))}
@@ -466,7 +476,7 @@ export const Carousel = defineComponent({
   },
 });
 
-// 12. Resilient TagBlock & Tag (supports TagBlock(items, size?, variant?))
+// 12. Resilient TagBlock & Tag
 export const Tag = defineComponent({
   name: "Tag",
   props: z.object({
@@ -477,7 +487,7 @@ export const Tag = defineComponent({
   }),
   description: "Small tag pill: Tag(text, icon?, size?, variant?)",
   component: ({ props }) => (
-    <span style={{ display: "inline-flex", alignItems: "center", gap: "4px", padding: "2px 8px", borderRadius: "12px", fontSize: "11px", background: "rgba(255, 255, 255, 0.08)", color: "#e4e4e7" }}>
+    <span style={{ display: "inline-flex", alignItems: "center", gap: "4px", padding: "2px 8px", borderRadius: "12px", fontSize: "11px", background: BG_SUBTLE, color: FG_PRIMARY, border: `1px solid ${BORDER_SUBTLE}` }}>
       {String(props.text ?? "")}
     </span>
   ),
@@ -502,7 +512,7 @@ export const TagBlock = defineComponent({
     return (
       <div style={{ display: "flex", flexWrap: "wrap", gap: "6px", margin: "4px 0" }}>
         {items.map((it: any, idx: number) => (
-          <span key={idx} style={{ display: "inline-flex", padding: pad, borderRadius: "12px", fontSize: size, background: "rgba(255, 255, 255, 0.08)", color: "#e4e4e7", fontWeight: 500 }}>
+          <span key={idx} style={{ display: "inline-flex", padding: pad, borderRadius: "12px", fontSize: size, background: BG_SUBTLE, color: FG_PRIMARY, border: `1px solid ${BORDER_SUBTLE}`, fontWeight: 500 }}>
             {typeof it === "string" ? it : renderNode(it)}
           </span>
         ))}
@@ -511,7 +521,7 @@ export const TagBlock = defineComponent({
   },
 });
 
-// 13. Resilient Image & ImageBlock (compact, eliminates empty waste space)
+// 13. Resilient Image & ImageBlock
 export const Image = defineComponent({
   name: "Image",
   props: z.object({
@@ -525,7 +535,7 @@ export const Image = defineComponent({
     const [error, setError] = React.useState(false);
     if (!props.src || error) {
       return (
-        <div style={{ padding: "6px 10px", borderRadius: "6px", background: "rgba(255, 255, 255, 0.04)", fontSize: "11px", color: "#a1a1aa", display: "inline-flex", alignItems: "center", gap: "6px", margin: "4px 0" }}>
+        <div style={{ padding: "6px 10px", borderRadius: "6px", background: BG_SUBTLE, fontSize: "11px", color: FG_SECONDARY, display: "inline-flex", alignItems: "center", gap: "6px", margin: "4px 0", border: `1px solid ${BORDER_SUBTLE}` }}>
           <span>🖼️</span>
           <span>{props.alt || "Image preview"}</span>
         </div>
@@ -556,7 +566,7 @@ export const ImageBlock = defineComponent({
     const [error, setError] = React.useState(false);
     if (error) {
       return (
-        <div style={{ padding: "6px 10px", borderRadius: "6px", background: "rgba(255, 255, 255, 0.04)", fontSize: "11px", color: "#a1a1aa", margin: "4px 0" }}>
+        <div style={{ padding: "6px 10px", borderRadius: "6px", background: BG_SUBTLE, fontSize: "11px", color: FG_SECONDARY, margin: "4px 0", border: `1px solid ${BORDER_SUBTLE}` }}>
           🖼️ {props.alt || "Image"}
         </div>
       );
@@ -564,7 +574,7 @@ export const ImageBlock = defineComponent({
     return (
       <div style={{ margin: "6px 0", maxWidth: "100%" }}>
         <img src={props.src} alt={props.alt} onError={() => setError(true)} style={{ maxWidth: "100%", maxHeight: "240px", objectFit: "cover", borderRadius: "6px", display: "block" }} />
-        {props.caption && <p style={{ fontSize: "11px", color: "#a1a1aa", marginTop: "4px" }}>{String(props.caption)}</p>}
+        {props.caption && <p style={{ fontSize: "11px", color: FG_SECONDARY, marginTop: "4px" }}>{String(props.caption)}</p>}
       </div>
     );
   },
@@ -578,7 +588,7 @@ export const ListBlock = defineComponent({
     variant: z.string().optional(),
   }),
   description: "List of items: ListBlock(items, variant?)",
-  component: ({ props, renderNode }) => {
+  component: ({ props }) => {
     let items = Array.isArray(props.items) ? props.items : [];
     const isNumbered = props.variant === "number" || props.variant === "numbered";
     return (
@@ -588,13 +598,13 @@ export const ListBlock = defineComponent({
           return (
             <div key={idx} style={{ display: "flex", gap: "8px", alignItems: "flex-start" }}>
               {isNumbered && (
-                <span style={{ width: "18px", height: "18px", borderRadius: "50%", background: "rgba(255, 255, 255, 0.1)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "10px", fontWeight: 600, flexShrink: 0 }}>
+                <span style={{ width: "18px", height: "18px", borderRadius: "50%", background: BG_SUBTLE, color: FG_PRIMARY, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "10px", fontWeight: 600, flexShrink: 0, border: `1px solid ${BORDER_SUBTLE}` }}>
                   {idx + 1}
                 </span>
               )}
               <div style={{ flex: 1 }}>
-                <div style={{ fontWeight: 600, fontSize: "13px", color: "#f4f4f5" }}>{p.title ?? (typeof it === "string" ? it : "")}</div>
-                {p.description && <div style={{ fontSize: "12px", color: "#a1a1aa", marginTop: "2px" }}>{String(p.description)}</div>}
+                <div style={{ fontWeight: 600, fontSize: "13px", color: FG_PRIMARY }}>{p.title ?? (typeof it === "string" ? it : "")}</div>
+                {p.description && <div style={{ fontSize: "12px", color: FG_SECONDARY, marginTop: "2px" }}>{String(p.description)}</div>}
               </div>
             </div>
           );
@@ -615,8 +625,8 @@ export const MetricIndicatorInline = defineComponent({
   description: "Inline KPI metric with optional trend: MetricIndicatorInline(value, subtext?, trend?)",
   component: ({ props }) => (
     <div style={{ display: "inline-flex", alignItems: "baseline", gap: "6px" }}>
-      <span style={{ fontSize: "16px", fontWeight: 700, color: "#f4f4f5" }}>{String(props.value)}</span>
-      {props.subtext && <span style={{ fontSize: "12px", color: "#a1a1aa" }}>{String(props.subtext)}</span>}
+      <span style={{ fontSize: "16px", fontWeight: 700, color: FG_PRIMARY }}>{String(props.value)}</span>
+      {props.subtext && <span style={{ fontSize: "12px", color: FG_SECONDARY }}>{String(props.subtext)}</span>}
       {props.trend && (
         <span style={{ fontSize: "11px", color: "#22c55e", fontWeight: 600 }}>
           {typeof props.trend === "string" ? props.trend : props.trend?.value ?? ""}
@@ -638,13 +648,13 @@ export const MetricIndicatorWithStrikethrough = defineComponent({
   component: ({ props }) => (
     <div style={{ display: "inline-flex", alignItems: "baseline", gap: "6px" }}>
       {props.previousValue && (
-        <span style={{ textDecoration: "line-through", color: "#71717a", fontSize: "13px" }}>
+        <span style={{ textDecoration: "line-through", color: FG_MUTED, fontSize: "13px" }}>
           {String(props.previousValue)}
         </span>
       )}
-      <span style={{ fontSize: "16px", fontWeight: 700, color: "#f4f4f5" }}>{String(props.value)}</span>
+      <span style={{ fontSize: "16px", fontWeight: 700, color: FG_PRIMARY }}>{String(props.value)}</span>
       {props.trend && <span style={{ fontSize: "11px", color: "#22c55e", fontWeight: 600 }}>{String(props.trend)}</span>}
-      {props.subtext && <span style={{ fontSize: "11px", color: "#a1a1aa" }}>{String(props.subtext)}</span>}
+      {props.subtext && <span style={{ fontSize: "11px", color: FG_SECONDARY }}>{String(props.subtext)}</span>}
     </div>
   ),
 });
@@ -678,7 +688,7 @@ export const OverviewCardBlock = defineComponent({
         {items.map((it: any, idx: number) => {
           const p = it?.props ?? it ?? {};
           return (
-            <div key={idx} style={{ padding: "12px", borderRadius: "8px", background: "rgba(255, 255, 255, 0.04)", border: "1px solid rgba(255, 255, 255, 0.1)", display: "flex", flexDirection: "column", gap: "6px" }}>
+            <div key={idx} style={{ padding: "12px", borderRadius: "8px", background: BG_CARD, border: `1px solid ${BORDER_DEFAULT}`, display: "flex", flexDirection: "column", gap: "6px" }}>
               {p.top && <div>{typeof p.top === "string" ? p.top : renderNode(p.top)}</div>}
               {p.bottom && <div>{typeof p.bottom === "string" ? p.bottom : renderNode(p.bottom)}</div>}
             </div>
@@ -719,13 +729,13 @@ export const CompositeCardBlock = defineComponent({
         {items.map((it: any, idx: number) => {
           const p = it?.props ?? it ?? {};
           return (
-            <div key={idx} style={{ padding: "12px", borderRadius: "8px", background: "rgba(255, 255, 255, 0.04)", border: "1px solid rgba(255, 255, 255, 0.1)", display: "flex", flexDirection: "column", gap: "6px" }}>
+            <div key={idx} style={{ padding: "12px", borderRadius: "8px", background: BG_CARD, border: `1px solid ${BORDER_DEFAULT}`, display: "flex", flexDirection: "column", gap: "6px" }}>
               {p.header && (
-                <div style={{ fontWeight: 600, fontSize: "14px", color: "#f4f4f5" }}>
+                <div style={{ fontWeight: 600, fontSize: "14px", color: FG_PRIMARY }}>
                   {typeof p.header === "string" ? p.header : renderNode(p.header)}
                 </div>
               )}
-              {p.body && <div style={{ flex: 1 }}>{Array.isArray(p.body) ? renderNode(p.body) : renderNode([p.body])}</div>}
+              {p.body && <div style={{ flex: 1, color: FG_SECONDARY }}>{Array.isArray(p.body) ? renderNode(p.body) : renderNode([p.body])}</div>}
               {p.footer && <div>{renderNode([p.footer?.button ?? p.footer])}</div>}
             </div>
           );
@@ -749,11 +759,11 @@ export const EntityList = defineComponent({
     const rows = props.rows ?? [];
     return (
       <div style={{ margin: "6px 0", fontSize: "13px" }}>
-        {props.header && <div style={{ fontWeight: 600, color: "#f4f4f5", marginBottom: "4px" }}>{String(props.header?.left ?? props.header)}</div>}
+        {props.header && <div style={{ fontWeight: 600, color: FG_PRIMARY, marginBottom: "4px" }}>{String(props.header?.left ?? props.header)}</div>}
         {rows.map((r: any, idx: number) => (
-          <div key={idx} style={{ display: "flex", justifyContent: "space-between", padding: "4px 0", borderBottom: "1px solid rgba(255, 255, 255, 0.05)" }}>
-            <span style={{ color: "#a1a1aa" }}>{String(r.left ?? "")}</span>
-            <span style={{ color: "#f4f4f5", fontWeight: 500 }}>{String(r.right ?? "")}</span>
+          <div key={idx} style={{ display: "flex", justifyContent: "space-between", padding: "4px 0", borderBottom: `1px solid ${BORDER_SUBTLE}` }}>
+            <span style={{ color: FG_SECONDARY }}>{String(r.left ?? "")}</span>
+            <span style={{ color: FG_PRIMARY, fontWeight: 500 }}>{String(r.right ?? "")}</span>
           </div>
         ))}
       </div>
@@ -771,10 +781,10 @@ export const Header = defineComponent({
   description: "Header section with title: Header(title, subtitle?)",
   component: ({ props }) => (
     <div style={{ marginBottom: "10px" }}>
-      <h3 style={{ fontSize: "16px", fontWeight: 700, margin: "0 0 4px 0", color: "#f4f4f5" }}>
+      <h3 style={{ fontSize: "16px", fontWeight: 700, margin: "0 0 4px 0", color: FG_PRIMARY }}>
         {typeof props.title === "string" ? props.title : ""}
       </h3>
-      {props.subtitle && <p style={{ fontSize: "12px", color: "#a1a1aa", margin: 0 }}>{String(props.subtitle)}</p>}
+      {props.subtitle && <p style={{ fontSize: "12px", color: FG_SECONDARY, margin: 0 }}>{String(props.subtitle)}</p>}
     </div>
   ),
 });
@@ -783,7 +793,7 @@ export const Divider = defineComponent({
   name: "Divider",
   props: z.object({}).optional(),
   description: "Horizontal divider line",
-  component: () => <hr style={{ border: "none", borderTop: "1px solid rgba(255, 255, 255, 0.1)", margin: "10px 0" }} />,
+  component: () => <hr style={{ border: "none", borderTop: `1px solid ${BORDER_DEFAULT}`, margin: "10px 0" }} />,
 });
 
 export const ScatterPoint = defineComponent({
@@ -846,8 +856,8 @@ export const Metric = defineComponent({
   description: "Metric readout: Metric(value, label?, trend?)",
   component: ({ props }) => (
     <div className="openui-metric" style={{ padding: "6px 0" }}>
-      <div style={{ fontSize: "22px", fontWeight: 700, color: "#f4f4f5", lineHeight: 1.2 }}>{String(props.value)}</div>
-      {props.label && <div style={{ fontSize: "12px", color: "#a1a1aa", marginTop: "2px" }}>{props.label}</div>}
+      <div style={{ fontSize: "22px", fontWeight: 700, color: FG_PRIMARY, lineHeight: 1.2 }}>{String(props.value)}</div>
+      {props.label && <div style={{ fontSize: "12px", color: FG_SECONDARY, marginTop: "2px" }}>{props.label}</div>}
       {props.trend && (
         <div style={{ fontSize: "11px", color: "#22c55e", marginTop: "2px" }}>
           {typeof props.trend === "string" ? props.trend : JSON.stringify(props.trend)}
@@ -867,11 +877,11 @@ export const StatCard = defineComponent({
   }),
   description: "Statistic card: StatCard(title, value, change?, description?)",
   component: ({ props }) => (
-    <div style={{ padding: "10px 12px", borderRadius: "8px", background: "rgba(255, 255, 255, 0.04)", border: "1px solid rgba(255, 255, 255, 0.1)" }}>
-      <div style={{ fontSize: "12px", color: "#a1a1aa", marginBottom: "4px" }}>{props.title}</div>
-      <div style={{ fontSize: "18px", fontWeight: 700, color: "#f4f4f5" }}>{String(props.value)}</div>
+    <div style={{ padding: "10px 12px", borderRadius: "8px", background: BG_CARD, border: `1px solid ${BORDER_DEFAULT}` }}>
+      <div style={{ fontSize: "12px", color: FG_SECONDARY, marginBottom: "4px" }}>{props.title}</div>
+      <div style={{ fontSize: "18px", fontWeight: 700, color: FG_PRIMARY }}>{String(props.value)}</div>
       {props.change && <div style={{ fontSize: "11px", color: "#22c55e", marginTop: "2px" }}>{String(props.change)}</div>}
-      {props.description && <div style={{ fontSize: "11px", color: "#71717a", marginTop: "4px" }}>{props.description}</div>}
+      {props.description && <div style={{ fontSize: "11px", color: FG_MUTED, marginTop: "4px" }}>{props.description}</div>}
     </div>
   ),
 });
