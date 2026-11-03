@@ -1293,12 +1293,61 @@ async function onProviderOAuth(request, { signal }) {
   throw new Error(`Unsupported OAuth operation: ${request.operation}`);
 }
 
+// --- Appearance Helpers ---
+async function hostLocale() {
+  try {
+    if (typeof pi !== "undefined" && pi.app && typeof pi.app.getLocale === "function") {
+      return await pi.app.getLocale();
+    }
+  } catch {}
+  return "en";
+}
+
+function appearanceBase(appearance) {
+  if (!appearance || typeof appearance !== "object") return "system";
+  if (appearance.base === "light" || appearance.base === "dark") return appearance.base;
+  if (appearance.theme === "light" || appearance.theme === "dark") return appearance.theme;
+  return "system";
+}
+
+function flattenAppearance(appearance, locale) {
+  const pluginTheme =
+    appearance && appearance.pluginTheme && typeof appearance.pluginTheme === "object"
+      ? appearance.pluginTheme
+      : null;
+  const base = appearanceBase(appearance);
+  return {
+    theme: (appearance && appearance.theme) || base,
+    base,
+    locale: (appearance && appearance.locale) || locale || "en",
+    pluginTheme,
+    pluginThemeCss:
+      (appearance && appearance.pluginThemeCss) || (pluginTheme && pluginTheme.css) || null,
+  };
+}
+
+async function readAppearance() {
+  const locale = await hostLocale();
+  try {
+    if (typeof pi !== "undefined" && pi.app && typeof pi.app.getAppearance === "function") {
+      const appearance = await pi.app.getAppearance();
+      if (appearance && typeof appearance === "object") {
+        const flat = flattenAppearance(appearance, locale);
+        if (flat.base === "light" || flat.base === "dark") return flat;
+      }
+    }
+  } catch {}
+  return null;
+}
+
 // --- Panel Bridge Dispatcher ---
 /**
  * Answers window.pluginBridge.invoke(...) from renderer/index.html.
  */
 async function onPanelInvoke(channel, payload) {
   switch (channel) {
+    case "app.getAppearance":
+      return await readAppearance();
     case "antigravity.getAccounts": {
       const store = loadAccountsStore();
       return {

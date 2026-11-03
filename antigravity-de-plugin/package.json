@@ -20,6 +20,7 @@
     "node": ">=22.15.0"
   },
   "scripts": {
+    "test": "bun test",
     "typecheck": "tsc --noEmit",
     "build": "echo 'Plugin is directly executable JavaScript and TypeScript for PI-Desktop'"
   },
