@@ -21,6 +21,8 @@ import {
 } from "@openuidev/react-ui";
 import { Lesson } from "./lesson";
 import { Scene3D } from "./scene3d";
+import { Drawio, Diagram } from "./drawio";
+import { Three3D } from "./three3d";
 
 // 1. Resilient CodeBlock: CodeBlock(code) or CodeBlock(language, code)
 export const CodeBlock = defineComponent({
@@ -948,9 +950,14 @@ export const renderLibrary = createLibrary({
     StatCard,
     Lesson,
     Scene3D,
+    Three3D,
+    Drawio,
+    Diagram,
   ],
 });
 
 export { openuiLibrary };
 export * from "./lesson";
 export * from "./scene3d";
+export * from "./drawio";
+export * from "./three3d";

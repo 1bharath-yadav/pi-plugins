@@ -10,7 +10,11 @@
     "@openuidev/lang-core": "1.0.2",
     "@openuidev/react-lang": "1.0.2",
     "@openuidev/react-ui": "^0.18.1",
+    "@types/pako": "^3.0.0",
+    "@types/three": "^0.187.0",
     "katex": "0.16.47",
+    "pako": "^3.0.3",
+    "three": "^0.187.0",
     "zod": "4.1.8"
   },
   "devDependencies": {

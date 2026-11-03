@@ -124,4 +124,35 @@ describe("OpenUI Lang Component Library & Parser", () => {
     expect(result.meta.errors).toEqual([]);
     expect(result.root?.typeName).toBe("Lesson");
   });
+
+  it("supports interactive Three.js 3D scenes (Three3D)", () => {
+    const program = [
+      'root = Stack([title, scene3d])',
+      'title = TextContent("Three.js Molecular Geometry", "large-heavy")',
+      'scene3d = Three3D([obj1, obj2], 380, "Chloroplast & Thylakoid")',
+      'obj1 = { type: "sphere", position: [0, 0, 0], color: "#22c55e", size: 0.9, label: "Chloroplast" }',
+      'obj2 = { type: "cylinder", position: [-1.8, 0, 0], color: "#10b981", size: [0.7, 0.2, 0.7], label: "Thylakoid" }',
+    ].join("\n");
+
+    const parser = createParser(renderLibrary.toJSONSchema(), renderLibrary.root);
+    const result = parser.parse(program);
+    expect(result.meta.errors).toEqual([]);
+    expect(result.root).toBeDefined();
+    expect(result.root?.typeName).toBe("Stack");
+  });
+
+  it("supports Draw.io / diagrams.net architecture diagrams (Drawio & Diagram)", () => {
+    const program = [
+      'root = Stack([title, diag, editDiag])',
+      'title = TextContent("System Architecture", "large-heavy")',
+      'diag = Drawio("<mxfile><diagram><mxGraphModel><root><mxCell id=\\"0\\"/><mxCell id=\\"1\\" parent=\\"0\\"/><mxCell id=\\"2\\" value=\\"Transformer Model\\" vertex=\\"1\\" parent=\\"1\\"><mxGeometry x=\\"100\\" y=\\"100\\" width=\\"160\\" height=\\"60\\" as=\\"geometry\\"/></mxCell></root></mxGraphModel></diagram></mxfile>", 420, "Decoder-only Architecture")',
+      'editDiag = Diagram("https://viewer.diagrams.net/?edit=_blank#Rsample", 400)',
+    ].join("\n");
+
+    const parser = createParser(renderLibrary.toJSONSchema(), renderLibrary.root);
+    const result = parser.parse(program);
+    expect(result.meta.errors).toEqual([]);
+    expect(result.root).toBeDefined();
+    expect(result.root?.typeName).toBe("Stack");
+  });
 });
