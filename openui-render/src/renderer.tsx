@@ -302,10 +302,7 @@ export function OpenUIEntryExtraComponent({ message }: { message: { content?: st
 export function OpenUIComposerControl({ position }: { position?: string }) {
   const [config, setConfig] = useState({
     enabled: true,
-    enable3D: true,
-    enableDrawio: true,
   });
-  const [showMenu, setShowMenu] = useState(false);
 
   // Read initial configuration from plugin process
   useEffect(() => {
@@ -316,8 +313,6 @@ export function OpenUIComposerControl({ position }: { position?: string }) {
           if (res && typeof res === "object") {
             setConfig({
               enabled: res.enabled !== false,
-              enable3D: res.enable3D !== false,
-              enableDrawio: res.enableDrawio !== false,
             });
           }
         })
@@ -360,53 +355,12 @@ export function OpenUIComposerControl({ position }: { position?: string }) {
         type="button"
         className={`pi-openui-composer-btn ${config.enabled ? "is-active" : "is-inactive"}`}
         onClick={handleToggle}
-        onContextMenu={(e) => {
-          e.preventDefault();
-          setShowMenu((m) => !m);
-        }}
-        title="OpenUI Rendering (Click to toggle, right-click for 3D/Drawio settings)"
+        title="OpenUI Rendering (Click to toggle)"
       >
         <OpenUIIcon size={16} active={config.enabled} />
         <span>OpenUi</span>
         <span className={`pi-openui-state-dot ${config.enabled ? "" : "is-off"}`} />
       </button>
-
-      <button
-        type="button"
-        className="pi-openui-composer-btn"
-        style={{ padding: "0 4px", fontSize: "10px", opacity: 0.7 }}
-        onClick={() => setShowMenu((m) => !m)}
-        title="OpenUI settings (3D & Drawio toggles)"
-      >
-        ⚙
-      </button>
-
-      {showMenu && (
-        <div className="pi-openui-popover">
-          <div className="pi-openui-popover-title">OpenUI Modules</div>
-          <label className="pi-openui-popover-item">
-            <span>🧊 Three.js 3D</span>
-            <input
-              type="checkbox"
-              checked={config.enable3D}
-              onChange={(e) => updateConfig({ enable3D: e.target.checked })}
-              style={{ accentColor: "#9333ea" }}
-            />
-          </label>
-          <label className="pi-openui-popover-item">
-            <span>📐 Draw.io Diagrams</span>
-            <input
-              type="checkbox"
-              checked={config.enableDrawio}
-              onChange={(e) => updateConfig({ enableDrawio: e.target.checked })}
-              style={{ accentColor: "#9333ea" }}
-            />
-          </label>
-          <div style={{ marginTop: "4px", paddingTop: "4px", borderTop: "1px solid var(--openui-border)", fontSize: "10px", color: "var(--openui-text-neutral-secondary)", textAlign: "right" }}>
-            <span style={{ cursor: "pointer" }} onClick={() => setShowMenu(false)}>Close ✕</span>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
