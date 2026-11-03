@@ -33,21 +33,114 @@
         "id": "antigravity",
         "name": "Google Antigravity",
         "category": "Google",
-        "description": "Access Gemini 2.5 Pro/Flash, Gemini 3 Flash/Pro, Claude 3.7 Sonnet & GPT models via Google Antigravity.",
-        "baseUrl": "https://daily-cloudcode-pa.googleapis.com",
-        "apiStyle": "google_generative_ai",
+        "description": "Access Gemini 3.8/3.7/3.6/3.5/3.1, Claude Sonnet/Opus 4.6 & GPT-OSS models via Google Antigravity.",
+        "baseUrl": "http://127.0.0.1:41789/v1",
+        "apiStyle": "chat_completions",
         "authKind": "oauth",
         "oauth": {
           "loginLabel": "Sign in with Google",
           "isSubscription": true
         },
         "models": [
-          { "id": "gemini-2.5-pro", "name": "Gemini 2.5 Pro", "contextWindow": 1048576, "maxTokens": 65536 },
-          { "id": "gemini-2.5-flash", "name": "Gemini 2.5 Flash", "contextWindow": 1048576, "maxTokens": 65536 },
-          { "id": "gemini-3-flash", "name": "Gemini 3 Flash", "contextWindow": 1048576, "maxTokens": 65536 },
-          { "id": "gemini-3-pro", "name": "Gemini 3 Pro", "contextWindow": 1048576, "maxTokens": 65536 },
-          { "id": "claude-3-7-sonnet", "name": "Claude 3.7 Sonnet (Antigravity)", "contextWindow": 200000, "maxTokens": 8192 },
-          { "id": "claude-3-5-sonnet", "name": "Claude 3.5 Sonnet (Antigravity)", "contextWindow": 200000, "maxTokens": 8192 }
+          {
+            "id": "gemini-3.8-flash",
+            "name": "Gemini 3.8 Flash (Antigravity)",
+            "contextWindow": 1048576,
+            "maxTokens": 65536,
+            "thinkingLevels": ["low", "medium", "high"],
+            "defaultThinkingLevel": "low",
+            "supportsImages": true
+          },
+          {
+            "id": "gemini-3.7-flash",
+            "name": "Gemini 3.7 Flash (Antigravity)",
+            "contextWindow": 1048576,
+            "maxTokens": 65536,
+            "thinkingLevels": ["low", "medium", "high"],
+            "defaultThinkingLevel": "low",
+            "supportsImages": true
+          },
+          {
+            "id": "gemini-3.6-flash",
+            "name": "Gemini 3.6 Flash (Antigravity)",
+            "contextWindow": 1048576,
+            "maxTokens": 65536,
+            "thinkingLevels": ["low", "medium", "high"],
+            "defaultThinkingLevel": "low",
+            "supportsImages": true
+          },
+          {
+            "id": "gemini-3.5-flash",
+            "name": "Gemini 3.5 Flash (Antigravity)",
+            "contextWindow": 1048576,
+            "maxTokens": 65536,
+            "thinkingLevels": ["low", "medium", "high"],
+            "defaultThinkingLevel": "low",
+            "supportsImages": true
+          },
+          {
+            "id": "gemini-3.1-pro",
+            "name": "Gemini 3.1 Pro (Antigravity)",
+            "contextWindow": 1048576,
+            "maxTokens": 65535,
+            "thinkingLevels": ["low", "high"],
+            "defaultThinkingLevel": "low",
+            "supportsImages": true
+          },
+          {
+            "id": "claude-sonnet-4-6",
+            "name": "Claude Sonnet 4.6 (Antigravity)",
+            "contextWindow": 200000,
+            "maxTokens": 64000,
+            "thinkingLevels": ["low", "high"],
+            "defaultThinkingLevel": "high",
+            "supportsImages": true
+          },
+          {
+            "id": "claude-opus-4-6",
+            "name": "Claude Opus 4.6 (Antigravity)",
+            "contextWindow": 250000,
+            "maxTokens": 64000,
+            "thinkingLevels": ["low", "high"],
+            "defaultThinkingLevel": "high",
+            "supportsImages": true
+          },
+          {
+            "id": "gpt-oss-120b",
+            "name": "GPT-OSS 120B (Antigravity)",
+            "contextWindow": 131072,
+            "maxTokens": 32768,
+            "thinkingLevels": ["medium"],
+            "defaultThinkingLevel": "medium",
+            "supportsImages": false
+          },
+          {
+            "id": "gemini-2.5-pro",
+            "name": "Gemini 2.5 Pro (Antigravity)",
+            "contextWindow": 1048576,
+            "maxTokens": 65536,
+            "thinkingLevels": ["low", "high"],
+            "defaultThinkingLevel": "high",
+            "supportsImages": true
+          },
+          {
+            "id": "gemini-2.5-flash",
+            "name": "Gemini 2.5 Flash (Antigravity)",
+            "contextWindow": 1048576,
+            "maxTokens": 65536,
+            "thinkingLevels": ["low", "high"],
+            "defaultThinkingLevel": "low",
+            "supportsImages": true
+          },
+          {
+            "id": "gemini-3-flash",
+            "name": "Gemini 3 Flash (Antigravity)",
+            "contextWindow": 1048576,
+            "maxTokens": 65536,
+            "thinkingLevels": ["low", "high"],
+            "defaultThinkingLevel": "low",
+            "supportsImages": true
+          }
         ]
       }
     ],

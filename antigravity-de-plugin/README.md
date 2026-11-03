@@ -2,7 +2,7 @@
 
 First-class **Google Antigravity & Cloud Code Assist** provider, OAuth manager, and real-time quota dashboard for [PI-Desktop](https://github.com/vastsa/PI-Desktop).
 
-Bridges Google's internal Antigravity endpoints into PI-Desktop: giving you access to **Gemini 2.5 Pro / Flash**, **Gemini 3 Flash / Pro**, **Claude 3.7 Sonnet**, **Claude 3.5 Sonnet**, and **Imagen 3** backed by your Google accounts.
+Bridges Google's internal Antigravity endpoints into PI-Desktop: giving you access to **Gemini 3.8 / 3.7 / 3.6 / 3.5 / 3.1**, **Gemini 2.5 Pro / Flash**, **Claude Sonnet 4.6**, **Claude Opus 4.6**, and **GPT-OSS 120B** backed by your Google accounts.
 
 ---
 

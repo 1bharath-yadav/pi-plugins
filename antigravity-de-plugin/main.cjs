@@ -37,7 +37,7 @@ const SCOPES = [
 ];
 
 const DEFAULT_CLIENT_ID_B64 =
-  "MTA3MTAwNjA2MDU5MS10bWhzc2luMmgyMWxjcmUyMzV2dG9sb2poNGc0MDNlYy5hcHBzLmdvb2dsZXVzZXJjb250ZW50LmNvbQ==";
+  "MTA3MTAwNjA2MDU5MS10bWhzc2luMmgyMWxjcmUyMzV2dG9sb2poNGc0MDNlcC5hcHBzLmdvb2dsZXVzZXJjb250ZW50LmNvbQ==";
 const DEFAULT_CLIENT_SECRET_B64 =
   "R09DU1BYLUs1OEZXUjQ4NkxkTExKMW1MQjhzWEM0ejZxREFm";
 
@@ -126,6 +126,7 @@ function activateAccount(idOrEmail) {
   store.activeAccountId = targetId;
   store.accounts[targetId].lastUsedAt = Date.now();
   saveAccountsStore(store);
+  syncActiveAccountToDesktopSecrets();
   return store.accounts[targetId];
 }
 
@@ -145,6 +146,7 @@ function removeAccount(idOrEmail) {
     store.activeAccountId = remaining[0];
   }
   saveAccountsStore(store);
+  syncActiveAccountToDesktopSecrets();
   return store.activeAccountId ? store.accounts[store.activeAccountId] : null;
 }
 
@@ -166,7 +168,63 @@ function rememberAccount(creds) {
     store.activeAccountId = accountId;
   }
   saveAccountsStore(store);
+  syncActiveAccountToDesktopSecrets();
   return stored;
+}
+
+function syncActiveAccountToDesktopSecrets() {
+  try {
+    const desktopDataDir = process.env.PI_DESKTOP_DATA_DIR || path.join(os.homedir(), ".pi-desktop");
+    const secretsDir = path.join(desktopDataDir, "secrets");
+    const machineKeyPath = path.join(secretsDir, ".machine-key");
+
+    if (!fs.existsSync(machineKeyPath)) {
+      return false;
+    }
+
+    const activeAccount = getActiveAccount();
+    if (!activeAccount || !activeAccount.access) {
+      return false;
+    }
+
+    const machineKey = fs.readFileSync(machineKeyPath);
+    if (machineKey.length !== 32) return false;
+
+    const providerRowId = "plugin:local.antigravity-de:antigravity";
+    const secretRef = `secret:provider:${providerRowId}:oauth`;
+    const hash = crypto.createHash("sha256").update(secretRef).digest("hex");
+    const secretFile = path.join(secretsDir, `${hash}.bin`);
+
+    const payload = JSON.stringify({
+      accessToken: activeAccount.access,
+      refreshToken: activeAccount.refresh || "",
+      expiresAt: activeAccount.expires || Date.now() + 3600 * 1000,
+      accountLabel: activeAccount.email || "Google Antigravity Account",
+    });
+
+    const nonce = crypto.randomBytes(12);
+    const cipher = crypto.createCipheriv("aes-256-gcm", machineKey, nonce);
+    const ciphertext = Buffer.concat([cipher.update(payload, "utf8"), cipher.final()]);
+    const tag = cipher.getAuthTag();
+    const blob = Buffer.concat([nonce, ciphertext, tag]);
+
+    fs.writeFileSync(secretFile, blob.toString("base64"), "utf8");
+
+    // Also update SQLite secrets_meta if sqlite3 is available
+    const sqlitePath = path.join(desktopDataDir, "pi.sqlite");
+    if (fs.existsSync(sqlitePath)) {
+      try {
+        const { execSync } = require("node:child_process");
+        const sql = `INSERT OR REPLACE INTO secrets_meta (secret_ref, owner_kind, owner_id, kind, backend, updated_at) VALUES ('${secretRef}', 'provider', '${providerRowId}', 'oauth', 'file_fallback', ${Date.now()});`;
+        execSync(`sqlite3 "${sqlitePath}" "${sql}"`, { stdio: "ignore" });
+      } catch {}
+    }
+
+    return true;
+  } catch (err) {
+    console.warn("[Antigravity Plugin] syncActiveAccountToDesktopSecrets warning:", err.message);
+    return false;
+  }
 }
 
 // --- PKCE & Cryptographic Utilities ---
@@ -514,9 +572,448 @@ function parseQuotaAndModels(data, tierInfo) {
   };
 }
 
+// --- Local OpenAI-compatible Bridge Server for PI-Desktop ---
+const BRIDGE_PORT = 41789;
+let bridgeServer = null;
+
+const MODEL_ROUTING = {
+  "gemini-3.8-flash": "gemini-3.8-flash-low",
+  "gemini-3.7-flash": "gemini-3.7-flash-low",
+  "gemini-3.6-flash": "gemini-3.6-flash-low",
+  "gemini-3.5-flash": "gemini-3.5-flash-extra-low",
+  "gemini-3.1-pro": "gemini-3.1-pro-low",
+  "claude-sonnet-4-6": "claude-sonnet-4-6",
+  "claude-opus-4-6": "claude-opus-4-6-thinking",
+  "gpt-oss-120b": "gpt-oss-120b-medium",
+  "gemini-2.5-pro": "gemini-2.5-pro",
+  "gemini-2.5-flash": "gemini-2.5-flash",
+  "gemini-3-flash": "gemini-3-flash",
+};
+
+function startBridgeServer() {
+  if (bridgeServer) return;
+
+  bridgeServer = http.createServer(async (req, res) => {
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+    res.setHeader("Access-Control-Allow-Headers", "*");
+
+    if (req.method === "OPTIONS") {
+      res.writeHead(204).end();
+      return;
+    }
+
+    if (req.method === "GET" && (req.url === "/v1/models" || req.url === "/models")) {
+      const modelsList = Object.keys(MODEL_ROUTING).map((id) => ({
+        id,
+        object: "model",
+        created: Math.floor(Date.now() / 1000),
+        owned_by: "google-antigravity",
+      }));
+      res.writeHead(200, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ object: "list", data: modelsList }));
+      return;
+    }
+
+    if (req.method === "POST" && (req.url === "/v1/chat/completions" || req.url === "/chat/completions")) {
+      let body = "";
+      req.on("data", (chunk) => (body += chunk));
+      req.on("end", async () => {
+        try {
+          const active = getActiveAccount();
+          if (!active) {
+            res.writeHead(401, { "Content-Type": "application/json" });
+            res.end(
+              JSON.stringify({
+                error: {
+                  message: "No active Google Antigravity account linked. Please sign in via the Antigravity dashboard first.",
+                  type: "authentication_error",
+                },
+              }),
+            );
+            return;
+          }
+
+          const token = await ensureValidAccessToken(active);
+          if (!token) {
+            res.writeHead(401, { "Content-Type": "application/json" });
+            res.end(
+              JSON.stringify({
+                error: {
+                  message: "Failed to authenticate with Google Antigravity. Please re-login.",
+                  type: "authentication_error",
+                },
+              }),
+            );
+            return;
+          }
+
+          const reqData = JSON.parse(body || "{}");
+          const isStream = reqData.stream !== false;
+          const reqModel = reqData.model || "gemini-3.8-flash";
+          const runtimeModel = MODEL_ROUTING[reqModel] || reqModel;
+
+          // Convert OpenAI messages to Google contents & systemInstruction
+          const systemParts = [];
+          const contents = [];
+
+          for (const msg of reqData.messages || []) {
+            if (msg.role === "system") {
+              const text = typeof msg.content === "string" ? msg.content : JSON.stringify(msg.content);
+              systemParts.push({ text });
+              continue;
+            }
+
+            if (msg.role === "user") {
+              const parts = [];
+              if (typeof msg.content === "string") {
+                parts.push({ text: msg.content });
+              } else if (Array.isArray(msg.content)) {
+                for (const part of msg.content) {
+                  if (part.type === "text" && part.text) {
+                    parts.push({ text: part.text });
+                  } else if (part.type === "image_url" && part.image_url?.url) {
+                    const match = part.image_url.url.match(/^data:([^;]+);base64,(.+)$/);
+                    if (match) {
+                      parts.push({
+                        inlineData: {
+                          mimeType: match[1],
+                          data: match[2],
+                        },
+                      });
+                    }
+                  }
+                }
+              }
+              if (parts.length > 0) {
+                contents.push({ role: "user", parts });
+              }
+              continue;
+            }
+
+            if (msg.role === "assistant") {
+              const parts = [];
+              if (msg.content) {
+                parts.push({ text: typeof msg.content === "string" ? msg.content : JSON.stringify(msg.content) });
+              }
+              if (Array.isArray(msg.tool_calls)) {
+                for (const tc of msg.tool_calls) {
+                  let args = {};
+                  try {
+                    args = JSON.parse(tc.function.arguments || "{}");
+                  } catch {}
+                  parts.push({
+                    functionCall: {
+                      name: tc.function.name,
+                      args,
+                    },
+                  });
+                }
+              }
+              if (parts.length > 0) {
+                contents.push({ role: "model", parts });
+              }
+              continue;
+            }
+
+            if (msg.role === "tool") {
+              contents.push({
+                role: "user",
+                parts: [
+                  {
+                    functionResponse: {
+                      name: msg.name || "tool",
+                      response: { result: msg.content },
+                    },
+                  },
+                ],
+              });
+              continue;
+            }
+          }
+
+          if (contents.length === 0) {
+            contents.push({ role: "user", parts: [{ text: "Hello" }] });
+          }
+
+          const googleTools = [];
+          if (Array.isArray(reqData.tools) && reqData.tools.length > 0) {
+            googleTools.push({
+              functionDeclarations: reqData.tools
+                .filter((t) => t.type === "function" && t.function)
+                .map((t) => ({
+                  name: t.function.name,
+                  description: t.function.description || "",
+                  parameters: t.function.parameters || {},
+                })),
+            });
+          }
+
+          const payload = {
+            project: "aicode-consumers",
+            model: runtimeModel,
+            request: {
+              contents,
+              systemInstruction: systemParts.length > 0 ? { role: "user", parts: systemParts } : undefined,
+              tools: googleTools.length > 0 ? googleTools : undefined,
+              generationConfig: {
+                maxOutputTokens: reqData.max_tokens || 8192,
+                temperature: reqData.temperature !== undefined ? reqData.temperature : 0.7,
+              },
+            },
+          };
+
+          const endpointsToTry = [
+            "https://daily-cloudcode-pa.googleapis.com",
+            "https://cloudcode-pa.googleapis.com",
+            "https://daily-cloudcode-pa.sandbox.googleapis.com",
+          ];
+
+          let gRes = null;
+          let lastFetchError = null;
+
+          for (const endpoint of endpointsToTry) {
+            try {
+              const candidate = await fetch(`${endpoint}/v1internal:streamGenerateContent?alt=sse`, {
+                method: "POST",
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                  "Content-Type": "application/json",
+                  "User-Agent": DEFAULT_USER_AGENT,
+                },
+                body: JSON.stringify(payload),
+              });
+
+              if (candidate.ok) {
+                gRes = candidate;
+                break;
+              } else if (candidate.status === 401) {
+                const refreshedToken = await ensureValidAccessToken(active);
+                const retryRes = await fetch(`${endpoint}/v1internal:streamGenerateContent?alt=sse`, {
+                  method: "POST",
+                  headers: {
+                    Authorization: `Bearer ${refreshedToken}`,
+                    "Content-Type": "application/json",
+                    "User-Agent": DEFAULT_USER_AGENT,
+                  },
+                  body: JSON.stringify(payload),
+                });
+                if (retryRes.ok) {
+                  gRes = retryRes;
+                  break;
+                }
+              }
+              const errBody = await candidate.text();
+              lastFetchError = new Error(`Endpoint ${endpoint} returned ${candidate.status}: ${errBody}`);
+            } catch (err) {
+              lastFetchError = err;
+            }
+          }
+
+          if (!gRes || !gRes.ok) {
+            res.writeHead(502, { "Content-Type": "application/json" });
+            res.end(
+              JSON.stringify({
+                error: {
+                  message: `Antigravity upstream error: ${lastFetchError?.message || "Failed to reach Google backend"}`,
+                  type: "api_error",
+                },
+              }),
+            );
+            return;
+          }
+
+          if (isStream) {
+            res.writeHead(200, {
+              "Content-Type": "text/event-stream; charset=utf-8",
+              "Cache-Control": "no-cache",
+              Connection: "keep-alive",
+            });
+
+            const reader = gRes.body.getReader();
+            const decoder = new TextDecoder();
+            let buffer = "";
+
+            while (true) {
+              const { done, value } = await reader.read();
+              if (done) break;
+              buffer += decoder.decode(value, { stream: true });
+              const lines = buffer.split("\n");
+              buffer = lines.pop() || "";
+
+              for (const line of lines) {
+                if (line.startsWith("data: ")) {
+                  try {
+                    const parsed = JSON.parse(line.slice(6));
+                    const candidate = parsed?.response?.candidates?.[0];
+                    const parts = candidate?.content?.parts || [];
+
+                    for (const part of parts) {
+                      if (part.text) {
+                        const chunk = {
+                          id: "chatcmpl-" + Date.now(),
+                          object: "chat.completion.chunk",
+                          created: Math.floor(Date.now() / 1000),
+                          model: reqModel,
+                          choices: [
+                            {
+                              index: 0,
+                              delta: part.thought ? { reasoning_content: part.text } : { content: part.text },
+                              finish_reason: null,
+                            },
+                          ],
+                        };
+                        res.write(`data: ${JSON.stringify(chunk)}\n\n`);
+                      } else if (part.functionCall) {
+                        const chunk = {
+                          id: "chatcmpl-" + Date.now(),
+                          object: "chat.completion.chunk",
+                          created: Math.floor(Date.now() / 1000),
+                          model: reqModel,
+                          choices: [
+                            {
+                              index: 0,
+                              delta: {
+                                tool_calls: [
+                                  {
+                                    index: 0,
+                                    id: "call_" + Math.random().toString(36).slice(2, 10),
+                                    type: "function",
+                                    function: {
+                                      name: part.functionCall.name,
+                                      arguments: JSON.stringify(part.functionCall.args || {}),
+                                    },
+                                  },
+                                ],
+                              },
+                              finish_reason: null,
+                            },
+                          ],
+                        };
+                        res.write(`data: ${JSON.stringify(chunk)}\n\n`);
+                      }
+                    }
+                  } catch {}
+                }
+              }
+            }
+
+            const finalChunk = {
+              id: "chatcmpl-" + Date.now(),
+              object: "chat.completion.chunk",
+              created: Math.floor(Date.now() / 1000),
+              model: reqModel,
+              choices: [
+                {
+                  index: 0,
+                  delta: {},
+                  finish_reason: "stop",
+                },
+              ],
+            };
+            res.write(`data: ${JSON.stringify(finalChunk)}\n\n`);
+            res.write(`data: [DONE]\n\n`);
+            res.end();
+          } else {
+            let fullText = "";
+            const toolCalls = [];
+            const reader = gRes.body.getReader();
+            const decoder = new TextDecoder();
+            let buffer = "";
+
+            while (true) {
+              const { done, value } = await reader.read();
+              if (done) break;
+              buffer += decoder.decode(value, { stream: true });
+              const lines = buffer.split("\n");
+              buffer = lines.pop() || "";
+
+              for (const line of lines) {
+                if (line.startsWith("data: ")) {
+                  try {
+                    const parsed = JSON.parse(line.slice(6));
+                    const candidate = parsed?.response?.candidates?.[0];
+                    for (const part of candidate?.content?.parts || []) {
+                      if (part.text && !part.thought) fullText += part.text;
+                      if (part.functionCall) {
+                        toolCalls.push({
+                          id: "call_" + Math.random().toString(36).slice(2, 10),
+                          type: "function",
+                          function: {
+                            name: part.functionCall.name,
+                            arguments: JSON.stringify(part.functionCall.args || {}),
+                          },
+                        });
+                      }
+                    }
+                  } catch {}
+                }
+              }
+            }
+
+            res.writeHead(200, { "Content-Type": "application/json" });
+            res.end(
+              JSON.stringify({
+                id: "chatcmpl-" + Date.now(),
+                object: "chat.completion",
+                created: Math.floor(Date.now() / 1000),
+                model: reqModel,
+                choices: [
+                  {
+                    index: 0,
+                    message: {
+                      role: "assistant",
+                      content: fullText || null,
+                      tool_calls: toolCalls.length > 0 ? toolCalls : undefined,
+                    },
+                    finish_reason: toolCalls.length > 0 ? "tool_calls" : "stop",
+                  },
+                ],
+              }),
+            );
+          }
+        } catch (err) {
+          console.error("[Antigravity Bridge] Error processing completion:", err);
+          if (!res.headersSent) {
+            res.writeHead(500, { "Content-Type": "application/json" });
+            res.end(JSON.stringify({ error: { message: err.message, type: "server_error" } }));
+          }
+        }
+      });
+      return;
+    }
+
+    res.writeHead(404, { "Content-Type": "application/json" });
+    res.end(JSON.stringify({ error: { message: "Not found", type: "invalid_request_error" } }));
+  });
+
+  bridgeServer.on("error", (err) => {
+    if (err.code === "EADDRINUSE") {
+      console.log(`[Antigravity Bridge] Port ${BRIDGE_PORT} in use, existing bridge active.`);
+    } else {
+      console.warn("[Antigravity Bridge] Server error:", err.message);
+    }
+  });
+
+  bridgeServer.listen(BRIDGE_PORT, "127.0.0.1", () => {
+    console.log(`[Antigravity Bridge] Local OpenAI-compatible bridge running on http://127.0.0.1:${BRIDGE_PORT}`);
+  });
+}
+
+function stopBridgeServer() {
+  if (bridgeServer) {
+    try {
+      bridgeServer.close();
+    } catch {}
+    bridgeServer = null;
+  }
+}
+
 // --- Lifecycle Exports ---
 async function onLoad() {
   console.log("[Antigravity Plugin] Loading in PI-Desktop host process...");
+  syncActiveAccountToDesktopSecrets();
+  startBridgeServer();
 
   if (typeof pi !== "undefined" && pi.commands && typeof pi.commands.register === "function") {
     try {
@@ -648,6 +1145,7 @@ async function onLoad() {
 
 async function onUnload() {
   console.log("[Antigravity Plugin] Unloading from PI-Desktop...");
+  stopBridgeServer();
   if (typeof pi !== "undefined" && pi.commands && typeof pi.commands.unregister === "function") {
     try {
       await pi.commands.unregister("antigravity.open");

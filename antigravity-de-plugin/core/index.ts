@@ -179,10 +179,17 @@ export default function (pi: ExtensionAPI): void {
   };
 
   // Pi 0.86 types are chat-only; newer Pi accepts mixed-operation models and images.
+  // Register under both canonical and PI-Desktop plugin provider IDs.
   pi.registerProvider(
     PROVIDER_ID,
     providerConfig as unknown as Parameters<typeof pi.registerProvider>[1],
   );
+  try {
+    pi.registerProvider(
+      `plugin:local.antigravity-de:${PROVIDER_ID}`,
+      providerConfig as unknown as Parameters<typeof pi.registerProvider>[1],
+    );
+  } catch {}
 
   pi.registerCommand("antigravity.usage", {
     description: "Show Antigravity shared quota pools (Gemini / Claude+GPT, 5h + weekly)",
