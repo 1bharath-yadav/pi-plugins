@@ -1,0 +1,647 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="pi-plugin-chrome" content="v2" />
+  <title>Google Antigravity</title>
+  <style>
+    :root {
+      --bg: #09090b;
+      --card-bg: #18181b;
+      --card-border: #27272a;
+      --card-border-hover: #3f3f46;
+      --text: #f4f4f5;
+      --text-muted: #a1a1aa;
+      --text-dim: #71717a;
+      --primary: #38bdf8;
+      --primary-hover: #0284c7;
+      --accent: #818cf8;
+      --success: #34d399;
+      --success-bg: rgba(52, 211, 153, 0.12);
+      --warning: #fbbf24;
+      --danger: #f87171;
+      --danger-bg: rgba(248, 113, 113, 0.12);
+      --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, system-ui, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      font-size: 13px;
+      line-height: 1.4;
+      padding-top: var(--pi-plugin-titlebar-height, 0px);
+      min-height: 100vh;
+      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .container {
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      flex: 1;
+    }
+
+    /* Header */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--card-border);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #38bdf8, #818cf8, #c084fc);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 15px;
+      color: #fff;
+      box-shadow: 0 2px 10px rgba(56, 189, 248, 0.3);
+    }
+
+    .brand-info h1 {
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+    }
+
+    .brand-info span {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .status-badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      padding: 4px 10px;
+      border-radius: 9999px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      color: var(--text-muted);
+    }
+
+    .status-badge.connected {
+      color: var(--success);
+      border-color: rgba(52, 211, 153, 0.3);
+      background: var(--success-bg);
+    }
+
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+
+    /* Cards */
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .card-title {
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    /* Account Section */
+    .account-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 8px 10px;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      transition: all 0.15s ease;
+    }
+
+    .account-row:hover {
+      border-color: var(--card-border-hover);
+    }
+
+    .account-row.active {
+      border-color: rgba(56, 189, 248, 0.4);
+      background: rgba(56, 189, 248, 0.04);
+    }
+
+    .account-info {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      overflow: hidden;
+    }
+
+    .account-avatar {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: #27272a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--primary);
+    }
+
+    .account-email {
+      font-size: 13px;
+      font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .active-tag {
+      font-size: 10px;
+      padding: 2px 6px;
+      background: rgba(56, 189, 248, 0.15);
+      color: var(--primary);
+      border-radius: 4px;
+      font-weight: 600;
+    }
+
+    .account-actions {
+      display: flex;
+      gap: 6px;
+    }
+
+    /* Buttons */
+    button {
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 500;
+      padding: 6px 12px;
+      border-radius: 6px;
+      border: 1px solid var(--card-border);
+      background: #27272a;
+      color: var(--text);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+    }
+
+    button:hover {
+      background: #3f3f46;
+      border-color: #52525b;
+    }
+
+    button.primary {
+      background: var(--primary);
+      color: #09090b;
+      font-weight: 600;
+      border-color: transparent;
+    }
+
+    button.primary:hover {
+      background: var(--primary-hover);
+    }
+
+    button.sm {
+      padding: 3px 8px;
+      font-size: 11px;
+    }
+
+    button.danger-sm {
+      padding: 3px 8px;
+      font-size: 11px;
+      background: transparent;
+      border-color: rgba(248, 113, 113, 0.3);
+      color: var(--danger);
+    }
+
+    button.danger-sm:hover {
+      background: var(--danger-bg);
+      border-color: var(--danger);
+    }
+
+    /* Quota Section */
+    .quota-pool-card {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .quota-pool-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .quota-pool-name {
+      font-weight: 600;
+      font-size: 12px;
+      color: var(--text);
+    }
+
+    .quota-pool-badge {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--primary);
+      background: rgba(56, 189, 248, 0.1);
+      padding: 2px 8px;
+      border-radius: 9999px;
+    }
+
+    .meter-item {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .meter-label-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .meter-val {
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .meter-reset {
+      font-size: 10px;
+      color: var(--text-dim);
+    }
+
+    .progress-track {
+      height: 8px;
+      background: #27272a;
+      border-radius: 9999px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .progress-fill {
+      height: 100%;
+      border-radius: 9999px;
+      background: linear-gradient(90deg, #38bdf8, #818cf8);
+      transition: width 0.4s ease;
+    }
+
+    .progress-fill.warning {
+      background: var(--warning);
+    }
+
+    .progress-fill.danger {
+      background: var(--danger);
+    }
+
+    /* Models list */
+    .models-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+    }
+
+    .model-badge {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--card-border);
+      border-radius: 6px;
+      padding: 6px 8px;
+      font-size: 11px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .model-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .model-name {
+      font-weight: 500;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .model-meta {
+      font-size: 10px;
+      color: var(--text-dim);
+    }
+
+    .empty-state {
+      padding: 24px;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <div class="brand">
+        <div class="brand-icon">G</div>
+        <div class="brand-info">
+          <h1>Google Antigravity</h1>
+          <span>Cloud Code Assist Provider</span>
+        </div>
+      </div>
+      <div id="statusBadge" class="status-badge">
+        <div class="status-dot"></div>
+        <span id="statusText">Checking...</span>
+      </div>
+    </div>
+
+    <!-- Active Account Card -->
+    <div class="card">
+      <div class="card-title">
+        <span>Linked Accounts</span>
+        <button id="addAccountBtn" class="sm primary">+ Add Google Account</button>
+      </div>
+      <div id="accountsList" style="display:flex; flex-direction:column; gap:6px;">
+        <div class="empty-state">Loading accounts...</div>
+      </div>
+    </div>
+
+    <!-- Quota Usage Card -->
+    <div class="card">
+      <div class="card-title">
+        <span>Live Quota Pools</span>
+        <button id="refreshQuotaBtn" class="sm">⟳ Refresh</button>
+      </div>
+      <div id="quotaContainer" style="display:flex; flex-direction:column; gap:10px;">
+        <div class="empty-state">Loading quota data...</div>
+      </div>
+    </div>
+
+    <!-- Available Models Card -->
+    <div class="card">
+      <div class="card-title">
+        <span>Discovered Models</span>
+      </div>
+      <div class="models-grid" id="modelsGrid">
+        <div class="model-badge">
+          <div class="model-name">Gemini 2.5 Pro</div>
+          <div class="model-meta">Thinking • 1M Context</div>
+        </div>
+        <div class="model-badge">
+          <div class="model-name">Gemini 3 Flash</div>
+          <div class="model-meta">Next-Gen Speed</div>
+        </div>
+        <div class="model-badge">
+          <div class="model-name">Gemini 3.8 Flash</div>
+          <div class="model-meta">High Speed • Vision</div>
+        </div>
+        <div class="model-badge">
+          <div class="model-name">Claude Sonnet 4.6</div>
+          <div class="model-meta">Hybrid Thinking</div>
+        </div>
+        <div class="model-badge">
+          <div class="model-name">Claude Opus 4.6</div>
+          <div class="model-meta">Advanced Reasoning</div>
+        </div>
+        <div class="model-badge">
+          <div class="model-name">GPT-OSS 120B</div>
+          <div class="model-meta">Open-weight Expert</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const bridge = window.pluginBridge;
+
+    function formatReset(resetTime) {
+      if (!resetTime) return "";
+      const ts = Date.parse(resetTime);
+      if (!Number.isFinite(ts)) return "";
+      const delta = ts - Date.now();
+      if (delta <= 0) return "resets now";
+      const totalMin = Math.round(delta / 60000);
+      const days = Math.floor(totalMin / (60 * 24));
+      const hours = Math.floor((totalMin % (60 * 24)) / 60);
+      const mins = totalMin % 60;
+      if (days > 0) return `resets in ${days}d ${hours}h`;
+      if (hours > 0) return `resets in ${hours}h ${mins}m`;
+      return `resets in ${mins}m`;
+    }
+
+    async function loadAccounts() {
+      try {
+        const res = await bridge.invoke("antigravity.getAccounts");
+        const listEl = document.getElementById("accountsList");
+        const badgeEl = document.getElementById("statusBadge");
+        const textEl = document.getElementById("statusText");
+
+        if (!res || !res.accounts || res.accounts.length === 0) {
+          listEl.innerHTML = `
+            <div class="empty-state">
+              <p>No Google accounts linked to Antigravity.</p>
+              <button id="emptyLoginBtn" class="primary" style="margin-top:6px;">Sign in with Google</button>
+            </div>
+          `;
+          document.getElementById("emptyLoginBtn")?.addEventListener("click", startLogin);
+          badgeEl.className = "status-badge";
+          textEl.textContent = "Disconnected";
+          return;
+        }
+
+        badgeEl.className = "status-badge connected";
+        textEl.textContent = "Connected";
+
+        listEl.innerHTML = res.accounts.map(acc => {
+          const email = acc.email || acc.accountId;
+          const initial = email.charAt(0).toUpperCase();
+          return `
+            <div class="account-row ${acc.active ? "active" : ""}">
+              <div class="account-info">
+                <div class="account-avatar">${initial}</div>
+                <div class="account-email">${escapeHtml(email)}</div>
+                ${acc.active ? '<span class="active-tag">Active</span>' : ''}
+              </div>
+              <div class="account-actions">
+                ${!acc.active ? `<button class="sm switch-btn" data-id="${escapeHtml(acc.accountId)}">Switch</button>` : ''}
+                <button class="danger-sm remove-btn" data-id="${escapeHtml(acc.accountId)}">✕</button>
+              </div>
+            </div>
+          `;
+        }).join("");
+
+        // Wire switch & remove
+        document.querySelectorAll(".switch-btn").forEach(btn => {
+          btn.addEventListener("click", async () => {
+            const id = btn.getAttribute("data-id");
+            btn.textContent = "...";
+            await bridge.invoke("antigravity.switchAccount", { accountId: id });
+            await loadAll();
+          });
+        });
+
+        document.querySelectorAll(".remove-btn").forEach(btn => {
+          btn.addEventListener("click", async () => {
+            const id = btn.getAttribute("data-id");
+            if (confirm("Remove this Google account from Antigravity?")) {
+              await bridge.invoke("antigravity.removeAccount", { accountId: id });
+              await loadAll();
+            }
+          });
+        });
+
+      } catch (err) {
+        console.error("Failed to load accounts:", err);
+      }
+    }
+
+    async function loadUsage() {
+      const container = document.getElementById("quotaContainer");
+      try {
+        const res = await bridge.invoke("antigravity.getUsage");
+        if (!res || !res.ok || !res.usage) {
+          container.innerHTML = `<div class="empty-state">${escapeHtml(res?.error || "Unable to fetch quota")}</div>`;
+          return;
+        }
+
+        const groups = res.usage.groups || [];
+        if (groups.length === 0) {
+          container.innerHTML = `<div class="empty-state">No quota pools available for this account.</div>`;
+          return;
+        }
+
+        container.innerHTML = groups.map(grp => {
+          // Take representative bucket for pool level
+          const rep = grp.buckets[0];
+          const pct = rep?.remainingPercent !== undefined ? rep.remainingPercent : 100;
+          const resetLabel = formatReset(rep?.resetTime);
+
+          let fillClass = "";
+          if (pct <= 15) fillClass = "danger";
+          else if (pct <= 40) fillClass = "warning";
+
+          return `
+            <div class="quota-pool-card">
+              <div class="quota-pool-header">
+                <span class="quota-pool-name">${escapeHtml(grp.displayName)}</span>
+                <span class="quota-pool-badge">${pct}% remaining</span>
+              </div>
+              <div class="meter-item">
+                <div class="progress-track">
+                  <div class="progress-fill ${fillClass}" style="width: ${pct}%;"></div>
+                </div>
+                <div class="meter-label-row">
+                  <span>${grp.buckets.length} shared models</span>
+                  <span class="meter-reset">${escapeHtml(resetLabel)}</span>
+                </div>
+              </div>
+            </div>
+          `;
+        }).join("");
+
+        // Render dynamic models if present
+        if (res.usage.models && res.usage.models.length > 0) {
+          const modelsGrid = document.getElementById("modelsGrid");
+          const topModels = res.usage.models.slice(0, 8);
+          modelsGrid.innerHTML = topModels.map(m => {
+            const meta = [];
+            if (m.supportsThinking) meta.push("Thinking");
+            if (m.supportsImages) meta.push("Vision");
+            if (m.recommended) meta.push("Recommended");
+            return `
+              <div class="model-badge">
+                <div class="model-name">${escapeHtml(m.name || m.id)}</div>
+                <div class="model-meta">${escapeHtml(meta.join(" • ") || "Model")}</div>
+              </div>
+            `;
+          }).join("");
+        }
+
+      } catch (err) {
+        container.innerHTML = `<div class="empty-state">Error: ${escapeHtml(err.message)}</div>`;
+      }
+    }
+
+    async function startLogin() {
+      const btn = document.getElementById("addAccountBtn");
+      const origText = btn.textContent;
+      btn.textContent = "Connecting...";
+      btn.disabled = true;
+
+      try {
+        await bridge.invoke("antigravity.login");
+        await loadAll();
+      } catch (err) {
+        alert("Google Sign-in failed: " + err.message);
+      } finally {
+        btn.textContent = origText;
+        btn.disabled = false;
+      }
+    }
+
+    function escapeHtml(text) {
+      if (!text) return "";
+      return String(text).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+    }
+
+    async function loadAll() {
+      await loadAccounts();
+      await loadUsage();
+    }
+
+    document.getElementById("addAccountBtn")?.addEventListener("click", startLogin);
+    document.getElementById("refreshQuotaBtn")?.addEventListener("click", async () => {
+      const btn = document.getElementById("refreshQuotaBtn");
+      btn.textContent = "⟳...";
+      await loadUsage();
+      btn.textContent = "⟳ Refresh";
+    });
+
+    loadAll();
+  </script>
+</body>
+</html>

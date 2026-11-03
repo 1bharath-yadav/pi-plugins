@@ -1,0 +1,30 @@
+{
+  "name": "antigravity-de-plugin",
+  "version": "0.1.0",
+  "description": "Google Antigravity & Cloud Code Assist plugin for PI-Desktop",
+  "author": "Bharath Yadav (@1bharath-yadav)",
+  "license": "MIT",
+  "main": "main.cjs",
+  "type": "module",
+  "keywords": [
+    "pi-desktop",
+    "pi-plugin",
+    "antigravity",
+    "google",
+    "oauth",
+    "provider",
+    "gemini",
+    "claude"
+  ],
+  "engines": {
+    "node": ">=22.15.0"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "build": "echo 'Plugin is directly executable JavaScript and TypeScript for PI-Desktop'"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.0",
+    "typescript": "^5.7.0"
+  }
+}

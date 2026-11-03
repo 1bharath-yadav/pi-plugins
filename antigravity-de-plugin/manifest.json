@@ -1,0 +1,153 @@
+{
+  "schemaVersion": 1,
+  "id": "local.antigravity-de",
+  "name": "Google Antigravity",
+  "version": "0.1.0",
+  "description": "Google Antigravity & Cloud Code Assist provider, multi-account OAuth management, and real-time quota monitor for PI-Desktop.",
+  "author": "1bharath-yadav",
+  "main": "main.cjs",
+  "ui": {
+    "panel": "renderer/index.html",
+    "width": 460,
+    "height": 600,
+    "title": {
+      "en": "Google Antigravity",
+      "zh-CN": "Google Antigravity"
+    }
+  },
+  "contributes": {
+    "views": [
+      {
+        "id": "antigravity-dashboard",
+        "title": {
+          "en": "Antigravity",
+          "zh-CN": "Antigravity"
+        },
+        "icon": "sparkles",
+        "entry": "renderer/index.html",
+        "order": 20
+      }
+    ],
+    "providers": [
+      {
+        "id": "antigravity",
+        "name": "Google Antigravity",
+        "category": "Google",
+        "description": "Access Gemini 2.5 Pro/Flash, Gemini 3 Flash/Pro, Claude 3.7 Sonnet & GPT models via Google Antigravity.",
+        "baseUrl": "https://daily-cloudcode-pa.googleapis.com",
+        "apiStyle": "google_generative_ai",
+        "authKind": "oauth",
+        "oauth": {
+          "loginLabel": "Sign in with Google",
+          "isSubscription": true
+        },
+        "models": [
+          { "id": "gemini-2.5-pro", "name": "Gemini 2.5 Pro", "contextWindow": 1048576, "maxTokens": 65536 },
+          { "id": "gemini-2.5-flash", "name": "Gemini 2.5 Flash", "contextWindow": 1048576, "maxTokens": 65536 },
+          { "id": "gemini-3-flash", "name": "Gemini 3 Flash", "contextWindow": 1048576, "maxTokens": 65536 },
+          { "id": "gemini-3-pro", "name": "Gemini 3 Pro", "contextWindow": 1048576, "maxTokens": 65536 },
+          { "id": "claude-3-7-sonnet", "name": "Claude 3.7 Sonnet (Antigravity)", "contextWindow": 200000, "maxTokens": 8192 },
+          { "id": "claude-3-5-sonnet", "name": "Claude 3.5 Sonnet (Antigravity)", "contextWindow": 200000, "maxTokens": 8192 }
+        ]
+      }
+    ],
+    "agentExtensions": [
+      "agent/extension.ts"
+    ],
+    "commands": [
+      {
+        "id": "antigravity.open",
+        "title": "Antigravity: Open Dashboard",
+        "keywords": ["antigravity", "quota", "usage", "google", "accounts", "gemini", "claude"],
+        "category": "Antigravity"
+      },
+      {
+        "id": "antigravity.login",
+        "title": "Antigravity: Sign in with Google",
+        "keywords": ["antigravity", "login", "oauth", "google", "auth"],
+        "category": "Antigravity"
+      },
+      {
+        "id": "antigravity.usage",
+        "title": "Antigravity: Check Quota Usage",
+        "keywords": ["antigravity", "usage", "quota", "limits", "gemini", "claude"],
+        "category": "Antigravity"
+      },
+      {
+        "id": "antigravity.accounts",
+        "title": "Antigravity: Manage Linked Accounts",
+        "keywords": ["antigravity", "accounts", "switch", "remove"],
+        "category": "Antigravity"
+      },
+      {
+        "id": "antigravity.refresh",
+        "title": "Antigravity: Refresh Dynamic Models & Quota",
+        "keywords": ["antigravity", "refresh", "models", "sync"],
+        "category": "Antigravity"
+      }
+    ],
+    "settings": [
+      {
+        "key": "endpoint",
+        "type": "string",
+        "default": "https://daily-cloudcode-pa.googleapis.com",
+        "title": "Antigravity API Endpoint",
+        "description": "Primary API endpoint URL for Google Cloud Code / Antigravity"
+      },
+      {
+        "key": "autoRefreshModels",
+        "type": "boolean",
+        "default": true,
+        "title": "Auto-refresh Models",
+        "description": "Automatically refresh dynamic model availability on session start"
+      },
+      {
+        "key": "enableWebSearch",
+        "type": "boolean",
+        "default": true,
+        "title": "Enable Google Search Grounding",
+        "description": "Enable antigravity_search agent tool powered by Google Search"
+      },
+      {
+        "key": "enableImageGeneration",
+        "type": "boolean",
+        "default": true,
+        "title": "Enable Imagen 3 Image Generation",
+        "description": "Enable antigravity_generate_image tool"
+      }
+    ]
+  },
+  "permissions": [
+    "agent.extension",
+    "provider.register",
+    "provider.oauth",
+    "net.fetch",
+    "ui.panel",
+    "ui.view",
+    "notify",
+    "shell.openExternal"
+  ],
+  "net": {
+    "domains": [
+      "accounts.google.com",
+      "oauth2.googleapis.com",
+      "*.googleapis.com",
+      "cloudcode-pa.googleapis.com",
+      "daily-cloudcode-pa.googleapis.com",
+      "daily-cloudcode-pa.sandbox.googleapis.com",
+      "localhost",
+      "127.0.0.1"
+    ]
+  },
+  "engines": {
+    "piDesktop": ">=0.1.0"
+  },
+  "activationEvents": [
+    "onStartup",
+    "onCommand:antigravity.open",
+    "onCommand:antigravity.login",
+    "onCommand:antigravity.usage",
+    "onCommand:antigravity.accounts",
+    "onCommand:antigravity.refresh"
+  ]
+}
