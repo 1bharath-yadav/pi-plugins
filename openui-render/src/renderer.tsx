@@ -18,16 +18,40 @@ function readHostColorScheme(): "dark" | "light" {
   const html = document.documentElement;
   const body = document.body;
 
-  // 1. Explicit data-theme attributes
-  const attr = html.getAttribute("data-theme") || body?.getAttribute("data-theme");
+  // 1. Host object properties
+  if (host?.theme === "light" || host?.ui?.theme === "light") return "light";
+  if (host?.theme === "dark" || host?.ui?.theme === "dark") return "dark";
+
+  // 2. Explicit data-theme or color-mode attributes
+  const attr =
+    html.getAttribute("data-theme") ||
+    body?.getAttribute("data-theme") ||
+    html.getAttribute("data-color-mode") ||
+    body?.getAttribute("data-color-mode") ||
+    html.getAttribute("data-theme-mode") ||
+    body?.getAttribute("data-theme-mode");
   if (attr === "light") return "light";
   if (attr === "dark") return "dark";
 
-  // 2. Class names
-  if (html.classList.contains("light") || body?.classList.contains("light")) return "light";
-  if (html.classList.contains("dark") || body?.classList.contains("dark")) return "dark";
+  // 3. Class names
+  if (
+    html.classList.contains("light") ||
+    body?.classList.contains("light") ||
+    html.classList.contains("theme-light") ||
+    body?.classList.contains("theme-light")
+  ) {
+    return "light";
+  }
+  if (
+    html.classList.contains("dark") ||
+    body?.classList.contains("dark") ||
+    html.classList.contains("theme-dark") ||
+    body?.classList.contains("theme-dark")
+  ) {
+    return "dark";
+  }
 
-  // 3. Computed style colorScheme or background brightness
+  // 4. Computed style colorScheme or background brightness
   if (typeof getComputedStyle !== "undefined") {
     try {
       const scheme = getComputedStyle(html).colorScheme || getComputedStyle(body || html).colorScheme;
@@ -38,12 +62,12 @@ function readHostColorScheme(): "dark" | "light" {
       const rgb = bg.match(/\d+/g);
       if (rgb && rgb.length >= 3) {
         const brightness = (Number(rgb[0]) * 299 + Number(rgb[1]) * 587 + Number(rgb[2]) * 114) / 1000;
-        if (brightness > 160) return "light";
+        if (brightness > 150) return "light";
       }
     } catch {}
   }
 
-  // 4. System preference
+  // 5. System preference
   return window.matchMedia?.("(prefers-color-scheme: light)").matches ? "light" : "dark";
 }
 
@@ -147,7 +171,7 @@ export function OpenUIBlockComponent({ language, source }: OpenUIBlockProps) {
 
   if (!code) {
     return (
-      <div className="pi-openui-card" data-openui-lang={language}>
+      <div className="pi-openui-card" data-theme={hostTheme} data-openui-lang={language}>
         <div className="pi-openui-header">
           <div className="pi-openui-tag">
             <OpenUIIcon size={18} />
@@ -162,7 +186,7 @@ export function OpenUIBlockComponent({ language, source }: OpenUIBlockProps) {
   }
 
   return (
-    <div className="pi-openui-card" data-openui-lang={language}>
+    <div className="pi-openui-card" data-theme={hostTheme} data-openui-lang={language}>
       <div className="pi-openui-header">
         <div className="pi-openui-tag">
           <OpenUIIcon size={18} />

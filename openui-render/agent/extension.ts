@@ -10,9 +10,16 @@ interface OpenUIConfig {
 
 function readPluginConfig(): OpenUIConfig {
   try {
-    const configPath = path.resolve(__dirname, "../config.json");
-    if (fs.existsSync(configPath)) {
-      const data = JSON.parse(fs.readFileSync(configPath, "utf-8"));
+    const configPath = path.resolve(__dirname, "../dist/config.json");
+    const legacyPath = path.resolve(__dirname, "../config.json");
+    const targetPath = fs.existsSync(configPath)
+      ? configPath
+      : fs.existsSync(legacyPath)
+      ? legacyPath
+      : null;
+
+    if (targetPath) {
+      const data = JSON.parse(fs.readFileSync(targetPath, "utf-8"));
       return {
         enabled: data.enabled !== false,
         enable3D: data.enable3D !== false,
@@ -20,7 +27,7 @@ function readPluginConfig(): OpenUIConfig {
       };
     }
   } catch (err) {
-    console.warn("[OpenUI] Failed to read config.json:", err);
+    console.warn("[OpenUI] Failed to read config:", err);
   }
   return { enabled: true, enable3D: true, enableDrawio: true };
 }

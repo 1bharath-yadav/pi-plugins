@@ -70,11 +70,11 @@ function DrawioComponent({ props }: { props: any }) {
     <div
       className="openui-drawio-container"
       style={{
-        border: "1px solid rgba(255, 255, 255, 0.12)",
+        border: "1px solid var(--openui-border, rgba(255, 255, 255, 0.12))",
         borderRadius: "8px",
         overflow: "hidden",
         margin: "12px 0",
-        background: "#18181b",
+        background: "var(--openui-popover-background, #18181b)",
       }}
     >
       <div
@@ -84,11 +84,11 @@ function DrawioComponent({ props }: { props: any }) {
           justifyContent: "space-between",
           alignItems: "center",
           padding: "8px 12px",
-          background: "rgba(255, 255, 255, 0.04)",
-          borderBottom: "1px solid rgba(255, 255, 255, 0.08)",
+          background: "var(--openui-highlight, rgba(255, 255, 255, 0.04))",
+          borderBottom: "1px solid var(--openui-border, rgba(255, 255, 255, 0.08))",
         }}
       >
-        <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "13px", fontWeight: 600, color: "#f4f4f5" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "13px", fontWeight: 600, color: "var(--openui-foreground, #f4f4f5)" }}>
           <span>📐</span>
           <span>{title}</span>
         </div>

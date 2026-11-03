@@ -37,14 +37,15 @@ const BORDER_SUBTLE = "var(--openui-border-default, var(--ds-border-subtle, rgba
 export const CodeBlock = defineComponent({
   name: "CodeBlock",
   props: z.object({
-    language: z.string().optional(),
-    codeString: z.string().optional(),
+    language: z.union([z.string(), z.any()]).optional(),
+    codeString: z.union([z.string(), z.any()]).optional(),
+    code: z.union([z.string(), z.any()]).optional(),
   }),
   description: "Syntax-highlighted code block. Usage: CodeBlock(code) or CodeBlock(language, code)",
   component: ({ props }) => {
-    const code = props.codeString ?? props.language ?? "";
-    const lang = props.codeString ? (props.language ?? "text") : "text";
-    return <OpenUICodeBlock language={lang} codeString={code} />;
+    const code = props.codeString ?? props.code ?? props.language ?? "";
+    const lang = props.codeString || props.code ? (typeof props.language === "string" ? props.language : "text") : "text";
+    return <OpenUICodeBlock language={lang} codeString={String(code)} />;
   },
 });
 
@@ -79,9 +80,19 @@ function renderSteps({ props, renderNode }: { props: any; renderNode: any }) {
     items = props.title;
   } else if (typeof props.title === "string") {
     title = props.title;
-    if (Array.isArray(props.items)) items = props.items;
+    if (Array.isArray(props.items)) {
+      items = props.items;
+    } else if (typeof props.items === "string") {
+      items = [props.items];
+    } else if (props.items) {
+      items = [props.items];
+    }
   } else if (Array.isArray(props.items)) {
     items = props.items;
+  } else if (typeof props.items === "string") {
+    items = [props.items];
+  } else if (props.items) {
+    items = [props.items];
   }
 
   return (
@@ -112,7 +123,7 @@ function renderSteps({ props, renderNode }: { props: any; renderNode: any }) {
 const createStepsSchema = () =>
   z.object({
     title: z.union([z.string(), z.array(z.any())]).optional(),
-    items: z.array(z.any()).optional(),
+    items: z.union([z.array(z.any()), z.string(), z.any()]).optional(),
   });
 
 export const Steps = defineComponent({
@@ -791,7 +802,7 @@ export const Header = defineComponent({
 
 export const Divider = defineComponent({
   name: "Divider",
-  props: z.object({}).optional(),
+  props: z.object({}),
   description: "Horizontal divider line",
   component: () => <hr style={{ border: "none", borderTop: `1px solid ${BORDER_DEFAULT}`, margin: "10px 0" }} />,
 });

@@ -37,11 +37,14 @@
 }
 
 /* Light mode adaptation matching PI-Desktop light tokens */
+.pi-openui-card[data-theme="light"],
+[data-theme="light"] .pi-openui-card,
+.openui-theme-light,
+.openui-container[data-theme="light"],
 :root[data-theme="light"] [data-pi-plugin],
 :root[data-theme="light"] .pi-openui-card,
 :root[data-theme="light"] .openui-card,
 [data-theme="light"] [data-pi-plugin],
-[data-theme="light"] .pi-openui-card,
 html.light [data-pi-plugin],
 html.light .pi-openui-card,
 body.light [data-pi-plugin],
@@ -49,17 +52,34 @@ body.light .pi-openui-card,
 .light [data-pi-plugin],
 .light .pi-openui-card {
   --openui-background: #ffffff !important;
-  --openui-foreground: #1a1c1f !important;
-  --openui-popover-background: #f9f9f9 !important;
+  --openui-foreground: #18181b !important;
+  --openui-popover-background: #f4f4f5 !important;
   --openui-border: rgba(0, 0, 0, 0.12) !important;
   --openui-border-default: rgba(0, 0, 0, 0.12) !important;
-  --openui-border-interactive: rgba(0, 0, 0, 0.22) !important;
-  --openui-text-neutral-primary: #1a1c1f !important;
+  --openui-border-interactive: rgba(0, 0, 0, 0.25) !important;
+  --openui-text-neutral-primary: #18181b !important;
   --openui-text-neutral-secondary: #52525b !important;
   --openui-text-neutral-tertiary: #71717a !important;
   --openui-highlight: rgba(0, 0, 0, 0.05) !important;
   --openui-shadow-m: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
-  color: #1a1c1f !important;
+  color: #18181b !important;
+}
+
+.pi-openui-card[data-theme="light"] .pi-openui-header,
+.pi-openui-card[data-theme="light"] .pi-openui-tag,
+.pi-openui-card[data-theme="light"] .pi-openui-title {
+  color: #18181b !important;
+}
+
+.pi-openui-card[data-theme="light"] .openui-text,
+.pi-openui-card[data-theme="light"] h1,
+.pi-openui-card[data-theme="light"] h2,
+.pi-openui-card[data-theme="light"] h3,
+.pi-openui-card[data-theme="light"] h4,
+.pi-openui-card[data-theme="light"] p,
+.pi-openui-card[data-theme="light"] label,
+.pi-openui-card[data-theme="light"] span {
+  color: inherit;
 }
 
 /* =========================================================================

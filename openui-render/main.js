@@ -8,12 +8,18 @@
 const fs = require("node:fs");
 const path = require("node:path");
 
-const configPath = path.join(__dirname, "config.json");
+const configPath = path.join(__dirname, "dist", "config.json");
+const legacyConfigPath = path.join(__dirname, "config.json");
 
 function loadConfig() {
   try {
-    if (fs.existsSync(configPath)) {
-      const data = JSON.parse(fs.readFileSync(configPath, "utf-8"));
+    const targetPath = fs.existsSync(configPath)
+      ? configPath
+      : fs.existsSync(legacyConfigPath)
+      ? legacyConfigPath
+      : null;
+    if (targetPath) {
+      const data = JSON.parse(fs.readFileSync(targetPath, "utf-8"));
       return {
         enabled: data.enabled !== false,
         enable3D: data.enable3D !== false,
@@ -26,6 +32,10 @@ function loadConfig() {
 
 function saveConfig(cfg) {
   try {
+    const dir = path.dirname(configPath);
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
     fs.writeFileSync(configPath, JSON.stringify(cfg, null, 2), "utf-8");
   } catch (err) {
     console.warn("[OpenUI] Failed to save config:", err);
@@ -35,14 +45,13 @@ function saveConfig(cfg) {
 let currentConfig = loadConfig();
 
 async function onLoad() {
-  // Sync initial settings if host settings API is available
+  // Sync initial settings if host settings API is available (in-memory only, no disk write to avoid reload loop)
   if (typeof pi !== "undefined" && pi.plugin && typeof pi.plugin.getSettings === "function") {
     try {
       const hostSettings = await pi.plugin.getSettings();
       if (hostSettings) {
         if (typeof hostSettings.enable3D === "boolean") currentConfig.enable3D = hostSettings.enable3D;
         if (typeof hostSettings.enableDrawio === "boolean") currentConfig.enableDrawio = hostSettings.enableDrawio;
-        saveConfig(currentConfig);
       }
     } catch {}
   }
