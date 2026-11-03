@@ -1,1 +1,5 @@
-{"enabled":true,"enable3D":true,"enableDrawio":true}
+{
+  "enabled": true,
+  "enable3D": true,
+  "enableDrawio": true
+}

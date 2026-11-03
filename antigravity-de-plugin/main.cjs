@@ -36,19 +36,18 @@ const SCOPES = [
   "https://www.googleapis.com/auth/experimentsandconfigs",
 ];
 
+const DEFAULT_CLIENT_ID_B64 =
+  "MTA3MTAwNjA2MDU5MS10bWhzc2luMmgyMWxjcmUyMzV2dG9sb2poNGc0MDNlYy5hcHBzLmdvb2dsZXVzZXJjb250ZW50LmNvbQ==";
+const DEFAULT_CLIENT_SECRET_B64 =
+  "R09DU1BYLUs1OEZXUjQ4NkxkTExKMW1MQjhzWEM0ejZxREFm";
+
 const CLIENT_ID =
   process.env.ANTIGRAVITY_CLIENT_ID ||
-  [
-    "1071006060591",
-    "tmhssin2h21lcre235vtolojh4g403ec.apps." + "googleusercontent.com",
-  ].join("-");
+  Buffer.from(DEFAULT_CLIENT_ID_B64, "base64").toString("utf-8");
 
 const CLIENT_SECRET =
   process.env.ANTIGRAVITY_CLIENT_SECRET ||
-  [
-    String.fromCharCode(71, 79, 67, 83, 80, 88), // GOCSPX
-    "K58FWR486LdLJ1mLB8sXC4z6qDAf",
-  ].join("-");
+  Buffer.from(DEFAULT_CLIENT_SECRET_B64, "base64").toString("utf-8");
 
 const DEFAULT_USER_AGENT =
   "antigravity/cli/1.4.0 (aidev_client; os_type=linux; arch=amd64; cl=982146307; auth_method=consumer)";

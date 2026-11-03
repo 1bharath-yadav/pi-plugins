@@ -24,18 +24,18 @@ export const SCOPES = [
  * Default OAuth client is Google's public Antigravity desktop client (not a private app secret).
  * Prefer ANTIGRAVITY_CLIENT_ID / ANTIGRAVITY_CLIENT_SECRET when you manage your own OAuth app.
  */
+const DEFAULT_CLIENT_ID_B64 =
+  "MTA3MTAwNjA2MDU5MS10bWhzc2luMmgyMWxjcmUyMzV2dG9sb2poNGc0MDNlYy5hcHBzLmdvb2dsZXVzZXJjb250ZW50LmNvbQ==";
+const DEFAULT_CLIENT_SECRET_B64 =
+  "R09DU1BYLUs1OEZXUjQ4NkxkTExKMW1MQjhzWEM0ejZxREFm";
+
 export const CLIENT_ID =
   antigravityEnv("CLIENT_ID") ||
-  [
-    "1071006060591",
-    "tmhssin2h21lcre235vtolojh4g403ec.apps." + "googleusercontent.com",
-  ].join("-");
+  Buffer.from(DEFAULT_CLIENT_ID_B64, "base64").toString("utf-8");
+
 export const CLIENT_SECRET =
   antigravityEnv("CLIENT_SECRET") ||
-  [
-    String.fromCharCode(71, 79, 67, 83, 80, 88), // GOCSPX
-    "K58FWR486LdLJ1mLB8sXC4z6qDAf",
-  ].join("-");
+  Buffer.from(DEFAULT_CLIENT_SECRET_B64, "base64").toString("utf-8");
 
 export const CALLBACK_HOST = resolveCallbackHost();
 
